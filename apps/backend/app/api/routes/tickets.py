@@ -1,0 +1,2 @@
+"""Routes for ticket retrieval."""
+
