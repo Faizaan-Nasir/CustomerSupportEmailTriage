@@ -2568,6 +2568,484 @@ State mismatch:
 
 ---
 
+### 5.13 Frontend Wireframes (Agent Dashboard)
+
+This section provides low-fidelity wireframes for the agent dashboard. The goal is not visual polish, but **clarity of layout, hierarchy, and interaction flow**.
+
+Each wireframe maps directly to system capabilities described in Section 4 of Proposed_Solution.md.
+
+---
+
+#### 1. Overall Layout (Primary Screen)
+
+This is the main working interface used by agents.
+
+	+----------------------+----------------------------------------------+
+	|                      |                                              |
+	|   Ticket List        |   Ticket Detail + Agent Panel                |
+	|                      |                                              |
+	|  ------------------  |   ----------------------------------------   |
+	|  TicketCard         |   Email View (Thread)                      |  
+	|  TicketCard         |   ----------------------------------------   |
+	|  TicketCard         |   Interpretation Panel                     |
+	|  TicketCard         |   ----------------------------------------   |
+	|                      |   Entities + Missing Info                  |
+	|                      |   ----------------------------------------   |
+	|                      |   Attachments                              |
+	|                      |   ----------------------------------------   |
+	|                      |   Agent Action Plan                        |
+	|                      |   ----------------------------------------   |
+	|                      |   Action Controls                          |
+	|                      |                                              |
+	+----------------------+----------------------------------------------+
+
+---
+
+#### 2. Ticket List Panel (Left)
+
+Purpose:
+- Quickly scan tickets
+- Prioritize based on urgency
+
+	+----------------------------------+
+	| 🔍 Search / Filters              |
+	+----------------------------------+
+	| [HIGH] Order issue - refund      |
+	| user@email.com                   |
+	| 2 hrs ago                        |
+	+----------------------------------+
+	| [MED] Delivery delayed           |
+	| user@email.com                   |
+	| 5 hrs ago                        |
+	+----------------------------------+
+	| [LOW] Product query              |
+	| user@email.com                   |
+	| 1 day ago                        |
+	+----------------------------------+
+
+---
+
+Design Notes:
+- Urgency color-coded:
+  - HIGH → red
+  - MED → yellow
+  - LOW → gray
+- Clicking a ticket loads detail view
+
+Maps to:
+- Section 4.6 (urgency prioritization)
+
+---
+
+#### 3. Email View (Top Right)
+
+Purpose:
+- Show original issue and conversation
+
+	+----------------------------------------------+
+	| Subject: Refund issue                        |
+	| From: user@email.com                         |
+	|                                              |
+	| "I was charged twice for my order..."        |
+	|                                              |
+	| ------------------------------------------   |
+	| Previous Messages (if any)                  |
+	+----------------------------------------------+
+
+---
+
+Maps to:
+- Section 4.2 (communication context)
+
+---
+
+#### 4. Interpretation Panel
+
+Purpose:
+- Show system understanding
+
+	+----------------------------------------------+
+	| 🧠 System Interpretation                     |
+	|----------------------------------------------|
+	| Intent: Refund Request                       |
+	| Category: Billing                            |
+	| Sentiment: Frustrated                        |
+	| Confidence: 0.82                             |
+	+----------------------------------------------+
+
+---
+
+Design Notes:
+- Confidence < 0.6 → show warning
+- Helps agent trust system output
+
+Maps to:
+- Section 4.1
+
+---
+
+#### 5. Entities + Missing Info Panel
+
+Purpose:
+- Show extracted and missing data
+
+	+----------------------------------------------+
+	| 📦 Extracted Data                            |
+	|----------------------------------------------|
+	| Order ID: 12345                              |
+	| Invoice ID: —                                |
+	| Payment Method: Credit Card                  |
+	+----------------------------------------------+
+
+	+----------------------------------------------+
+	| ⚠ Missing Information                        |
+	|----------------------------------------------|
+	| - Invoice ID                                 |
+	+----------------------------------------------+
+
+---
+
+Design Notes:
+- Missing fields highlighted in red
+- Editable fields for agent correction
+
+Maps to:
+- Section 4.3
+
+---
+
+#### 6. Attachment Viewer
+
+Purpose:
+- Show uploaded files and extracted content
+
+	+----------------------------------------------+
+	| 📎 Attachments                               |
+	|----------------------------------------------|
+	| invoice_123.pdf                              |
+	| [Preview Button]                             |
+	|                                              |
+	| Extracted Content:                           |
+	| "Invoice ID: INV-98765"                      |
+	+----------------------------------------------+
+
+---
+
+Design Notes:
+- Toggle for "show extracted text"
+- Supports RAG debugging
+
+Maps to:
+- Section 4.5
+
+---
+
+#### 7. Agent Action Panel (Core Component)
+
+Purpose:
+- Provide clear next steps
+
+	+----------------------------------------------+
+	| 🤖 Suggested Action Plan                     |
+	|----------------------------------------------|
+	| Summary:                                     |
+	| Customer was charged twice for order.        |
+	|                                              |
+	| Steps:                                       |
+	| 1. Verify order details                      |
+	| 2. Check duplicate transaction               |
+	| 3. Initiate refund                           |
+	|                                              |
+	| Escalation: Not Required                     |
+	+----------------------------------------------+
+
+---
+
+Design Notes:
+- This is the most important block
+- Should feel like “instruction mode”
+
+Maps to:
+- Section 4.5
+
+---
+
+#### 8. Action Controls (Bottom Panel)
+
+Purpose:
+- Allow agent actions
+
+	+----------------------------------------------+
+	| ✉ Reply                                      |
+	|----------------------------------------------|
+	| [Text Input Box]                             |
+	|                                              |
+	| [Send Reply]                                 |
+	+----------------------------------------------+
+
+	+----------------------------------------------+
+	| ⚙ Actions                                    |
+	|----------------------------------------------|
+	| [Escalate to Finance]                        |
+	| [Mark as Resolved]                           |
+	+----------------------------------------------+
+
+---
+
+Design Notes:
+- Disable escalate if missing info exists
+- Pre-fill reply suggestion (optional)
+
+Maps to:
+- Section 4.7
+
+---
+
+#### 9. Interaction Flow
+
+1. Agent opens dashboard  
+2. Sees prioritized ticket list  
+3. Clicks ticket  
+4. Reviews:
+   - email  
+   - interpretation  
+   - extracted data  
+   - missing info  
+5. Follows action plan  
+6. Performs action (reply / escalate / resolve)
+
+---
+
+#### 10. Key UX Principles
+
+- Always show system reasoning
+- Minimize agent cognitive load
+- Make next action obvious
+- Prevent invalid actions
+- Keep layout consistent across tickets
+
+---
+
+#### Summary
+
+These wireframes represent a **decision-support interface**, not just a dashboard.
+
+The UI ensures:
+- transparency of system reasoning
+- clarity of required actions
+- minimal back-and-forth
+- tight integration with backend pipeline
+
+### 5.14 Design Theme (Frontend Dashboard)
+
+This section defines the **visual design system and UI constraints** for the agent dashboard. The objective is to maintain a **minimal, focused, and distraction-free interface** that complements the decision-support nature of the system.
+
+The design must prioritize:
+- clarity over aesthetics
+- readability over decoration
+- consistency over experimentation
+
+---
+
+#### 1. Design Philosophy
+
+The dashboard is not intended to be visually complex or expressive. It must:
+
+- minimize cognitive load for agents
+- avoid unnecessary visual noise
+- emphasize structured information hierarchy
+- ensure that actionable elements are immediately identifiable
+
+The UI should feel:
+- controlled
+- calm
+- predictable
+
+---
+
+#### 2. Typography
+
+Primary Font:
+
+	Fira Code
+
+Usage:
+
+- All text across the application must use Fira Code
+- This includes:
+  - headings
+  - labels
+  - body text
+  - input fields
+  - buttons
+
+Reasoning:
+
+- Monospaced font improves readability of structured data
+- Aligns well with technical and data-heavy interfaces
+- Reinforces consistency across extracted fields and system outputs
+
+---
+
+#### 3. Color System
+
+##### Primary Theme Color
+
+	#FFA749
+
+This is the dominant accent color and should be used for:
+
+- highlights
+- active elements
+- selected states
+- primary buttons
+
+---
+
+##### Secondary Colors
+
+Only the following palette is allowed:
+
+- shades of #FFA749 (lighter and darker variants)
+- grayscale tones:
+  - dark gray (backgrounds)
+  - medium gray (containers)
+  - light gray (borders and separators)
+
+---
+
+##### Strict Restrictions
+
+The following must NOT be used anywhere in the UI:
+
+- blue (any shade)
+- green (any shade)
+- gradients of any kind
+- multi-color highlights
+
+Reason:
+
+- maintain visual consistency
+- avoid distraction
+- reinforce a single visual identity
+
+---
+
+#### 4. Background and Contrast
+
+- Background should be dark gray or near-black
+- All text must be:
+
+	color: white
+
+- Secondary text may use lighter gray (but remain readable)
+
+This ensures:
+- high contrast
+- reduced eye strain
+- clear hierarchy
+
+---
+
+#### 5. Component Styling
+
+##### Borders
+
+- Circular or rounded borders must be used throughout
+- No sharp edges
+
+Recommended:
+
+	border-radius: 12px to 20px
+
+Applies to:
+- cards
+- panels
+- buttons
+- input fields
+
+---
+
+##### Shadows
+
+- Minimal or no shadows
+- Prefer separation via spacing and contrast
+
+---
+
+##### Spacing
+
+- Generous padding between sections
+- Clear visual grouping of components
+
+---
+
+#### 6. Button Design
+
+Primary Button:
+- Background: #FFA749
+- Text: white
+- Rounded corners
+
+Secondary Button:
+- Background: transparent or dark gray
+- Border: light gray
+- Text: white
+
+Hover State:
+- Slightly darker/lighter shade of #FFA749
+- No animations or gradients
+
+---
+
+#### 7. Panel Structure
+
+Each panel (e.g., interpretation, entities, agent plan) should:
+
+- be enclosed in a rounded container
+- have consistent padding
+- be separated by spacing, not lines
+
+Hierarchy should be conveyed using:
+- spacing
+- font weight
+- subtle color variation
+
+---
+
+#### 8. Interaction Feedback
+
+- Avoid flashy animations
+- Use subtle transitions only (if necessary)
+- Feedback should be immediate and minimal
+
+---
+
+#### 9. Consistency Rules
+
+- Same component must look identical across all pages
+- Same data type must be styled consistently
+- No experimental styles per component
+
+---
+
+#### 10. Summary
+
+The design system is intentionally restrictive.
+
+It enforces:
+- a single dominant color (#FFA749)
+- grayscale support palette
+- strict avoidance of blue, green, and gradients
+- consistent use of Fira Code
+- rounded, minimal UI elements
+- white text for clarity
+
+This ensures the dashboard remains:
+- focused
+- readable
+- aligned with its role as a decision-support system
+
 ### Summary
 
 The frontend acts as:

@@ -30,6 +30,15 @@ class EntityRecord(TypedDict, total=False):
     created_at: str
 
 
+class EntityUpdateInput(TypedDict, total=False):
+    """Payload for updating an extracted entity."""
+
+    key: str
+    value: str
+    source: str
+    confidence: float
+
+
 @dataclass
 class EntityRepository:
     """CRUD-style operations for the `entities` table."""
@@ -78,6 +87,16 @@ class EntityRepository:
         )
         return EntityRecord(self._first_row(response))
 
+    def update_entity(self, entity_id: str, payload: EntityUpdateInput) -> EntityRecord:
+        """Update an entity record and return the normalized row."""
+        response = (
+            self._client.table(self.table_name)
+            .update(dict(payload))
+            .eq("id", entity_id)
+            .execute()
+        )
+        return EntityRecord(self._first_row(response))
+
 
 _repo: EntityRepository | None = None
 
@@ -104,3 +123,7 @@ def get_entity(entity_id: str) -> EntityRecord:
     """Compatibility helper for direct record lookup."""
     return get_entity_repository().get_entity(entity_id)
 
+
+def update_entity(entity_id: str, payload: EntityUpdateInput) -> EntityRecord:
+    """Compatibility helper for updating entity records."""
+    return get_entity_repository().update_entity(entity_id, payload)
