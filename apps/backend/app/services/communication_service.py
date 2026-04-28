@@ -139,6 +139,26 @@ Guidelines:
 - End with a professional closing.
 - Do not include the "AI generated" warning here; it will be added by the service.
 
+Example: 
+\"\"\"
+Sample Input:
+Current Situation:
+- Intent: request_refund
+- Category: billing_issue
+- Sentiment: frustrated
+- Missing Info: Order ID, Payment method
+\"\"\"
+
+Sample Output:
+\"\"\"
+Dear Customer,
+We're sorry to hear about the billing issue you're experiencing and we'd like to to resolve it as quickly as possible. 
+While the issue has been forwarded to our customer support team, we request you to provide us additional information to help us expedite the process. 
+This includes your Order ID and Payment method.
+Thank you for your patience and cooperation.
+Sincerely,
+Customer Support Team
+\"\"\"
 Response:
 """.strip()
 

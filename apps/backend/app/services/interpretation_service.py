@@ -139,7 +139,7 @@ class InterpretationService:
             context_str += "\n"
 
         return f"""
-You are analyzing a customer support interaction for a unified decision system.
+Assume the role of a customer support analyst interpreting the customer's current message in the context of the entire email thread.
 
 Your output becomes the single source of truth for downstream actions, so it must
 be consistent, cautious, and grounded in the entire interaction history.
@@ -172,6 +172,44 @@ Guidelines:
 - Urgency must be evaluated for the entire context of the thread. A second or third response
     about a critical issue might increase urgency if it is still unresolved.
 - Return JSON only.
+
+A sample email and ideal interpretation:
+Email 1:
+\"\"\"
+Respected sir,
+The baby milk I had bought from your online store happened to be expired. I only identified
+this issue when my 2-month-old baby drank the milk, got sick and was hospitalized. This coming from
+a reputed store that claims to provide best quality products is really disappointing.
+I request you to process a refund and also urge you to look into your inventory to ensure such things don't repeat.
+\"\"\"
+
+Ideal interpretation:
+{
+    "intent": "request_refund",
+    "category": "product_issue",
+    "sentiment": "frustrated",
+    "urgency": 0.9,
+    "confidence": 0.95,
+    "reasoning": "The customer is requesting a refund due to a defective product that caused harm to their baby, which is a highly urgent and frustrating situation."
+}
+
+Email 2: 
+\"\"\"
+Respected sir, 
+I recently ordered a stroller from your online store, however I have received the order 5 days
+after it was supposed to be delivered. This was only after a lot of back and forth with the delivery company.
+I would request you to formally look into this matter and ensure that such delays don't happen in the future.
+\"\"\"
+
+Ideal interpretation:
+{
+    "intent": "complaint",
+    "category": "shipping_issue",
+    "sentiment": "frustrated",
+    "urgency": 0.5,
+    "confidence": 0.9,
+    "reasoning": "The customer is expressing frustration about a delayed delivery and is requesting the company to address the issue to prevent future occurrences."
+}
 """.strip()
 
     def interpret_email(self, payload: InterpretationInput) -> InterpretationResult:

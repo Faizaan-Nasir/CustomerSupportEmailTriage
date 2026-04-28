@@ -1,0 +1,9 @@
+==================================
+This is a system generated invoice
+==================================
+Customer name: Customer
+Product name: Baby stroller
+Manufacturer: BabiesNet INC.
+Price: Rupees 5000
+Bought On Date: 21st April 2026
+Payment details: Paid by VISA Card ...1234
