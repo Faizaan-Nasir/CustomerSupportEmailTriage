@@ -60,11 +60,36 @@ ENTITY_SCHEMA: dict[str, Any] = {
 }
 
 
+SUPPORTED_ENTITY_KEYS: set[str] = {
+    "order_id",
+    "invoice_id",
+    "tracking_number",
+    "transaction_reference",
+    "payment_method",
+    "product_name",
+    "order_date",
+    "delivery_address",
+    "account_email",
+}
+
+
 REGEX_PATTERNS: dict[str, re.Pattern[str]] = {
-    "order_id": re.compile(r"\b(?:order\s*(?:id|number)?\s*[:#-]?\s*)?([A-Z]{2,5}-\d{3,}|\bORD-\d+\b)", re.IGNORECASE),
-    "invoice_id": re.compile(r"\b(?:invoice\s*(?:id|number)?\s*[:#-]?\s*)?([A-Z]{2,5}-\d{3,}|\bINV-\d+\b)", re.IGNORECASE),
-    "tracking_number": re.compile(r"\b(?:tracking\s*(?:id|number)?\s*[:#-]?\s*)?([A-Z0-9]{8,})\b", re.IGNORECASE),
-    "transaction_reference": re.compile(r"\b(?:transaction|payment)\s*(?:id|reference|ref)?\s*[:#-]?\s*([A-Z0-9-]{6,})\b", re.IGNORECASE),
+    "order_id": re.compile(
+        r"\border\s*(?:id|number)?\s*[:#-]?\s*([A-Z]{2,5}-\d{3,}|\d{5,}|ORD-\d+)\b",
+        re.IGNORECASE,
+    ),
+    "invoice_id": re.compile(
+        r"\binvoice\s*(?:id|number)?\s*[:#-]?\s*([A-Z]{2,5}-\d{3,}|\d{5,}|INV-\d+)\b",
+        re.IGNORECASE,
+    ),
+    "tracking_number": re.compile(
+        r"\btracking\s*(?:id|number)?\s*[:#-]?\s*([A-Z0-9-]{8,})\b",
+        re.IGNORECASE,
+    ),
+    "transaction_reference": re.compile(
+        r"\b(?:transaction|payment)\s*(?:id|reference|ref)?\s*[:#-]?\s*([A-Z0-9-]{6,})\b",
+        re.IGNORECASE,
+    ),
 }
 
 
@@ -86,6 +111,55 @@ def _dedupe_key(entity: ExtractedEntity) -> tuple[str, str]:
     return (_normalize_label(entity["key"]), entity["value"].strip().lower())
 
 
+def _looks_like_specific_value(value: str) -> bool:
+    stripped = value.strip()
+    if not stripped:
+        return False
+    if len(stripped) > 120:
+        return False
+    if "\n" in stripped:
+        return False
+    return True
+
+
+def _keyword_candidates(body: str) -> list[str]:
+    lowered = body.lower()
+    keywords = {"order", "invoice", "tracking", "transaction", "payment"}
+
+    if any(term in lowered for term in {"refund", "charged", "billing", "invoice", "payment"}):
+        keywords.update({"refund", "charge", "billing", "card"})
+    if any(term in lowered for term in {"shipping", "delivery", "tracking"}):
+        keywords.update({"shipping", "delivery", "address"})
+    if any(term in lowered for term in {"product", "defect", "damaged"}):
+        keywords.update({"product", "defect", "damaged"})
+    if any(term in lowered for term in {"account", "login", "password"}):
+        keywords.update({"account", "login", "email"})
+
+    return sorted(keywords)
+
+
+def _relevant_attachment_context(body: str, rag_chunks: list[str], *, line_limit: int = 12) -> list[str]:
+    keywords = _keyword_candidates(body)
+    narrowed_chunks: list[str] = []
+
+    for chunk in rag_chunks:
+        matched_lines: list[str] = []
+        for line in chunk.splitlines():
+            stripped = line.strip()
+            if not stripped:
+                continue
+            lowered = stripped.lower()
+            if any(keyword in lowered for keyword in keywords):
+                matched_lines.append(stripped)
+            if len(matched_lines) >= line_limit:
+                break
+
+        if matched_lines:
+            narrowed_chunks.append("\n".join(matched_lines))
+
+    return narrowed_chunks
+
+
 @dataclass
 class EntityExtractionService:
     """Extract structured entities from email body content and retrieved attachments."""
@@ -97,7 +171,7 @@ class EntityExtractionService:
         for key, pattern in REGEX_PATTERNS.items():
             for match in pattern.finditer(combined_text):
                 value = match.group(1).strip()
-                if not value:
+                if not _looks_like_specific_value(value):
                     continue
                 source = "email_body" if match.start() < len(body) else "rag_attachment"
                 entities.append(
@@ -130,6 +204,14 @@ Important examples of useful entities:
 - product_name
 - order_date
 - delivery_address
+- account_email
+
+Restrictions:
+- Return only the supported keys listed above.
+- Extract only customer-resolution details tied to this specific ticket.
+- Ignore generic examples, documentation text, headings, repeated template content, and unrelated identifiers.
+- If attachment text is broad or reference-like, be conservative and return fewer entities rather than guessing.
+- Do not return more than 8 entities.
 
 For each entity return:
 - key: normalized snake_case label
@@ -164,10 +246,11 @@ Attachment context:
             raise ValueError("body is required.")
 
         rag_chunks = retrieve_relevant_chunks(query=query, ticket_id=ticket_id, top_k=top_k)["chunks"]
-        regex_entities = self._extract_with_regex(body, rag_chunks)
+        filtered_rag_chunks = _relevant_attachment_context(body, rag_chunks)
+        regex_entities = self._extract_with_regex(body, filtered_rag_chunks)
 
         llm_response = get_client().generate_text(
-            self._build_prompt(body, rag_chunks),
+            self._build_prompt(body, filtered_rag_chunks),
             temperature=0.1,
             expect_json=True,
         )
@@ -181,6 +264,8 @@ Attachment context:
                 "source": entity["source"],
                 "confidence": _clamp_score(entity["confidence"]),
             }
+            if normalized["key"] not in SUPPORTED_ENTITY_KEYS:
+                continue
             merged[_dedupe_key(normalized)] = normalized
 
         for entity in validated["entities"]:
@@ -190,6 +275,10 @@ Attachment context:
                 "source": _normalize_label(entity["source"]),
                 "confidence": _clamp_score(entity["confidence"]),
             }
+            if normalized["key"] not in SUPPORTED_ENTITY_KEYS:
+                continue
+            if not _looks_like_specific_value(normalized["value"]):
+                continue
             dedupe = _dedupe_key(normalized)
             current = merged.get(dedupe)
             if current is None or normalized["confidence"] > current["confidence"]:
@@ -219,7 +308,7 @@ Attachment context:
         return {
             "ticket_id": ticket_id,
             "entities": persisted_entities,
-            "rag_chunks": rag_chunks,
+            "rag_chunks": filtered_rag_chunks,
         }
 
 
@@ -237,4 +326,3 @@ def get_entity_extraction_service() -> EntityExtractionService:
 def extract_entities(payload: EntityExtractionInput) -> EntityExtractionResult:
     """Compatibility helper matching the technical document wording."""
     return get_entity_extraction_service().extract_entities(payload)
-
