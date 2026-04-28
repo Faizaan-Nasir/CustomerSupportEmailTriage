@@ -41,6 +41,9 @@ class GeminiClient:
     """Thin wrapper around Gemini text generation with retry support."""
 
     DEFAULT_MODEL_CANDIDATES = (
+        "models/gemma-3-27b-it",
+        "models/gemma-4-31b-it",
+        "models/gemma-3-12b-it",
         "models/gemini-2.5-flash",
         "models/gemini-2.0-flash",
         "models/gemini-flash-latest",
@@ -67,6 +70,20 @@ class GeminiClient:
             resolved_name = self.model_name or self._resolve_model_name(genai)
             self._model = genai.GenerativeModel(resolved_name)
         return self._model
+
+    def _build_generation_config(
+        self,
+        *,
+        temperature: float,
+        expect_json: bool,
+        json_mode_enabled: bool,
+    ) -> dict[str, Any]:
+        generation_config: dict[str, Any] = {
+            "temperature": temperature,
+        }
+        if expect_json and json_mode_enabled:
+            generation_config["response_mime_type"] = "application/json"
+        return generation_config
 
     def _resolve_model_name(self, genai: Any) -> str:
         available_models = {
@@ -116,15 +133,15 @@ class GeminiClient:
         if not prompt.strip():
             raise ValueError("Prompt must not be empty.")
 
-        generation_config: dict[str, Any] = {
-            "temperature": temperature,
-        }
-        if expect_json:
-            generation_config["response_mime_type"] = "application/json"
-
         last_error: Exception | None = None
+        json_mode_enabled = expect_json
         for attempt in range(1, self.max_retries + 1):
             try:
+                generation_config = self._build_generation_config(
+                    temperature=temperature,
+                    expect_json=expect_json,
+                    json_mode_enabled=json_mode_enabled,
+                )
                 response = self._get_model().generate_content(
                     prompt,
                     generation_config=generation_config,
@@ -133,12 +150,16 @@ class GeminiClient:
                 if not text:
                     raise LLMClientError("Gemini returned an empty response.")
 
-                if expect_json:
+                if expect_json and json_mode_enabled:
                     json.loads(text)
 
                 return LLMResponse(text=text, raw=response).to_dict()
             except Exception as exc:
                 last_error = exc
+                error_text = str(exc)
+                if expect_json and json_mode_enabled and "JSON mode is not enabled" in error_text:
+                    json_mode_enabled = False
+                    continue
                 if attempt == self.max_retries:
                     break
                 time.sleep(self.retry_delay_seconds)
