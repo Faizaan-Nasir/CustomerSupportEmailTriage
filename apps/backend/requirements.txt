@@ -1,3 +1,15 @@
-# Backend Python dependencies will be defined here.
+fastapi
+uvicorn
 supabase
-
+psycopg2-binary
+google-generativeai
+pymupdf
+pdfplumber
+pytesseract
+pillow
+sentence-transformers
+celery
+redis
+pydantic
+python-dotenv
+loguru
