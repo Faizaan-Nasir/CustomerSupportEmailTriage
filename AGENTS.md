@@ -7,3 +7,7 @@ Whenever creating a file, ensure that it doesn't break the existing systems. Con
 Do not implement anything without asking first. Only one file must be implemented at a time. The entire project is meant to be like building blocks. 
 
 If there are any pre-requisites, that you need me to do, then pause your execution. Do not fill in sample data just because you don't have data.
+
+Provide only a short summary of the changes you've made, do not use extra tokens on explaining your changes as they've already been summarised in the docs.
+
+Suggest if it is the right stage to commit a particular version - with appropriate commit message.
