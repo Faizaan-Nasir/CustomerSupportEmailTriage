@@ -3,6 +3,7 @@ uvicorn
 supabase
 psycopg2-binary
 google-generativeai
+python-multipart
 pymupdf
 pdfplumber
 pytesseract

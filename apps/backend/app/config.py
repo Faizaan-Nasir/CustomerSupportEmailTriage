@@ -89,11 +89,6 @@ class Settings:
     supabase_anon_key: str | None
     gemini_api_key: str
 
-    gmail_client_id: str | None
-    gmail_client_secret: str | None
-    gmail_refresh_token: str | None
-    gmail_sender_email: str | None
-
     smtp_host: str | None
     smtp_port: int | None
     smtp_user: str | None
@@ -163,34 +158,15 @@ class Settings:
         backend_root = Path(__file__).resolve().parents[1]
         repo_root = Path(__file__).resolve().parents[3]
 
-        smtp_host = _get_first(values, "SMTP_HOST", "GMAIL_SMTP_HOST")
-        smtp_port_raw = _get_first(values, "SMTP_PORT", "GMAIL_SMTP_PORT")
-        smtp_user = _get_first(values, "SMTP_USER", "GMAIL_SMTP_USER")
-        smtp_password = _get_first(values, "SMTP_PASSWORD", "GMAIL_SMTP_PASSWORD")
+        smtp_host = _get_first(values, "SMTP_HOST")
+        smtp_port_raw = _get_first(values, "SMTP_PORT")
+        smtp_user = _get_first(values, "SMTP_USER")
+        smtp_password = _get_first(values, "SMTP_PASSWORD")
         smtp_sender_email = _get_first(
             values,
             "SMTP_SENDER_EMAIL",
-            "GMAIL_SENDER_EMAIL",
-            "GMAIL_SMTP_USER",
             "SMTP_USER",
         )
-
-        gmail_client_id = _get_first(values, "GMAIL_CLIENT_ID")
-        gmail_client_secret = _get_first(values, "GMAIL_CLIENT_SECRET")
-        gmail_refresh_token = _get_first(values, "GMAIL_REFRESH_TOKEN")
-        gmail_sender_email = _get_first(values, "GMAIL_SENDER_EMAIL")
-
-        has_gmail_api = all(
-            [gmail_client_id, gmail_client_secret, gmail_refresh_token, gmail_sender_email]
-        )
-        has_smtp = all([smtp_host, smtp_port_raw, smtp_user, smtp_password])
-
-        if not has_gmail_api and not has_smtp:
-            raise ConfigError(
-                "Email configuration is incomplete. Configure either Gmail API "
-                "(GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN, "
-                "GMAIL_SENDER_EMAIL) or SMTP (SMTP_* or GMAIL_SMTP_* variables)."
-            )
 
         return cls(
             supabase_url=_require(values, "SUPABASE_URL"),
@@ -201,10 +177,6 @@ class Settings:
                 "SUPABASE_PUBLISHABLE_KEY",
             ),
             gemini_api_key=_require(values, "GEMINI_API_KEY"),
-            gmail_client_id=gmail_client_id,
-            gmail_client_secret=gmail_client_secret,
-            gmail_refresh_token=gmail_refresh_token,
-            gmail_sender_email=gmail_sender_email,
             smtp_host=smtp_host,
             smtp_port=_parse_int("SMTP_PORT", smtp_port_raw) if smtp_port_raw else None,
             smtp_user=smtp_user,

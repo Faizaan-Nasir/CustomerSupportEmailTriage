@@ -1,4 +1,5 @@
 import { useDeferredValue, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import type { TicketListItem } from "../types/ticket";
 import TicketCard from "./TicketCard";
@@ -16,6 +17,7 @@ export default function TicketList({
   loading,
   error,
 }: TicketListProps) {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
   const normalizedQuery = deferredSearch.trim().toLowerCase();
@@ -52,9 +54,19 @@ export default function TicketList({
   return (
     <section className="panel panel--sidebar">
       <div className="panel__header panel__header--stacked">
-        <div>
-          <p className="eyebrow">Queue</p>
-          <h2>Ticket list</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+          <div>
+            <p className="eyebrow">Queue</p>
+            <h2>Ticket list</h2>
+          </div>
+          <button
+            className="button button--primary"
+            onClick={() => navigate("/")}
+            style={{ padding: '6px 12px', fontSize: '0.8rem' }}
+            type="button"
+          >
+            Dashboard
+          </button>
         </div>
         <label className="search-field">
           <span>Search / Filters</span>

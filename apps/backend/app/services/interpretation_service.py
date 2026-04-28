@@ -8,13 +8,16 @@ from typing import Any, TypedDict
 from app.llm.client import get_client
 from app.llm.structured_output import validate_structured_output
 from app.repositories.interpretation_repo import create_interpretation
+from app.repositories.ticket_repo import update_ticket
+from app.repositories.supabase_client import get_client as get_supabase_client
 
 
-class InterpretationInput(TypedDict):
+class InterpretationInput(TypedDict, total=False):
     """Input contract for email interpretation."""
 
     ticket_id: str
     body: str
+    context: list[dict[str, str]] | None
 
 
 class InterpretationResult(TypedDict, total=False):
@@ -125,48 +128,57 @@ def _clamp_score(value: Any) -> float:
 
 @dataclass
 class InterpretationService:
-    """Analyze an email and persist the result as the shared interpretation layer."""
+    """Analyze an interaction and persist the result as the shared interpretation layer."""
 
-    def _build_prompt(self, body: str) -> str:
+    def _build_prompt(self, body: str, context: list[dict[str, str]] | None = None) -> str:
+        context_str = ""
+        if context:
+            context_str = "Conversation history (thread):\n"
+            for msg in context:
+                context_str += f"- {msg.get('sender', 'unknown')}: {msg.get('content', '')}\n"
+            context_str += "\n"
+
         return f"""
-You are analyzing a customer support email for a unified decision system.
+You are analyzing a customer support interaction for a unified decision system.
 
 Your output becomes the single source of truth for downstream actions, so it must
-be consistent, cautious, and grounded only in the email content.
+be consistent, cautious, and grounded in the entire interaction history.
 
-Interpret the email across the following dimensions:
-- intent: what the customer is trying to achieve
+{context_str}Current message from customer:
+\"\"\"
+{body}
+\"\"\"
+
+Interpret the interaction across the following dimensions:
+- intent: what the customer is trying to achieve now
 - category: the issue domain
-- sentiment: the emotional tone
-- urgency: a score from 0.0 to 1.0
+- sentiment: the current emotional tone
+- urgency: a score from 0.0 to 1.0, reflecting the severity of the entire thread
 - confidence: a score from 0.0 to 1.0 representing interpretation certainty
 - reasoning: one or two concise sentences explaining the interpretation
 
 Guidelines:
 - Prefer normalized snake_case labels for intent, category, and sentiment.
 - Use only one of these category labels:
-  billing_issue, shipping_issue, product_issue, account_issue, complaint, general_inquiry
+    billing_issue, shipping_issue, product_issue, account_issue, complaint, general_inquiry
 - When the message is about refunds, double charges, invoices, payments, or transaction problems,
-  use category billing_issue instead of alternate names like billing or billing_and_payments.
+    use category billing_issue instead of alternate names like billing or billing_and_payments.
 - Use only one of these intent labels when applicable:
-  request_refund, complaint, clarification_request, general_inquiry
+    request_refund, complaint, clarification_request, general_inquiry
 - Use only one of these sentiment labels when applicable:
-  neutral, frustrated, urgent
-- Do not invent facts not supported by the email.
+    neutral, frustrated, urgent
+- Do not invent facts not supported by the email or context.
 - If the email is ambiguous, lower confidence rather than overcommitting.
-- Urgency should reflect language, sentiment, and issue severity in the email.
+- Urgency must be evaluated for the entire context of the thread. A second or third response
+    about a critical issue might increase urgency if it is still unresolved.
 - Return JSON only.
-
-Email body:
-\"\"\"
-{body}
-\"\"\"
 """.strip()
 
     def interpret_email(self, payload: InterpretationInput) -> InterpretationResult:
-        """Interpret an email body, store the result, and return the normalized output."""
+        """Interpret an interaction, store the result, and return the normalized output."""
         ticket_id = payload["ticket_id"].strip()
         body = payload["body"].strip()
+        context = payload.get("context")
 
         if not ticket_id:
             raise ValueError("ticket_id is required.")
@@ -174,10 +186,11 @@ Email body:
             raise ValueError("body is required.")
 
         response = get_client().generate_text(
-            self._build_prompt(body),
+            self._build_prompt(body, context),
             temperature=0.1,
             expect_json=True,
         )
+        print(f"Raw interpretation response for ticket {ticket_id}:", response)
         validated = validate_structured_output(response["text"], INTERPRETATION_SCHEMA)[
             "validated_json"
         ]
@@ -190,6 +203,12 @@ Email body:
             "confidence": _clamp_score(validated["confidence"]),
             "reasoning": validated["reasoning"].strip(),
         }
+        print(f"Interpretation for ticket {ticket_id}: {normalized_output}")
+
+        raw_output_blob = {
+            "validated": validated,
+            "thread_context": context
+        }
 
         persisted = create_interpretation(
             {
@@ -200,9 +219,11 @@ Email body:
                 "urgency": normalized_output["urgency"],
                 "confidence": normalized_output["confidence"],
                 "reasoning": normalized_output["reasoning"],
-                "raw_output": validated,
+                "raw_output": raw_output_blob,
             }
         )
+
+        update_ticket(ticket_id, {"urgency_score": normalized_output["urgency"]})
 
         return {
             "interpretation_id": persisted["id"],
@@ -213,7 +234,7 @@ Email body:
             "urgency": normalized_output["urgency"],
             "confidence": normalized_output["confidence"],
             "reasoning": normalized_output["reasoning"],
-            "raw_output": validated,
+            "raw_output": raw_output_blob,
         }
 
 

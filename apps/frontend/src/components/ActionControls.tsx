@@ -27,15 +27,15 @@ export default function ActionControls({
       const payload =
         action === "reply"
           ? {
-              ticket_id: ticketId,
-              action,
-              data: { content: draft },
-            }
+            ticket_id: ticketId,
+            action,
+            data: { content: draft },
+          }
           : {
-              ticket_id: ticketId,
-              action,
-              data: { note: draft },
-            };
+            ticket_id: ticketId,
+            action,
+            data: { note: draft },
+          };
 
       await sendAgentAction(payload);
       setDraft("");

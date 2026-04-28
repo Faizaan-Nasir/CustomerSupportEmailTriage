@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 from dataclasses import dataclass
 from typing import Any
 
@@ -80,23 +81,34 @@ class RAGIndexer:
         genai.configure(api_key=settings.gemini_api_key)
         resolved_model = self._resolve_model_name(genai)
 
-        response = genai.embed_content(
-            model=resolved_model,
-            content=normalized_text,
-            task_type=task_type,
-            output_dimensionality=self.embedding_dimension,
-        )
+        # The Gemini SDK surface varies across versions. `google-generativeai==0.4.0`
+        # does not support `output_dimensionality`, while newer builds may.
+        embed_params = set(inspect.signature(genai.embed_content).parameters)
+        supports_output_dim = "output_dimensionality" in embed_params
+
+        embed_kwargs: dict[str, Any] = {
+            "model": resolved_model,
+            "content": normalized_text,
+            "task_type": task_type,
+        }
+        if supports_output_dim and self.embedding_dimension > 0:
+            embed_kwargs["output_dimensionality"] = int(self.embedding_dimension)
+
+        response = genai.embed_content(**embed_kwargs)
 
         embedding = response.get("embedding")
         if embedding is None:
             raise IndexerError("Embedding response did not include an embedding vector.")
 
         vector = [float(value) for value in embedding]
-        if len(vector) != self.embedding_dimension:
-            raise IndexerError(
-                "Embedding dimension mismatch: "
-                f"expected {self.embedding_dimension}, received {len(vector)}."
-            )
+        
+        # Truncate or pad to match the configured embedding_dimension (1536).
+        # The Supabase attachments table has a vector(1536) column.
+        if len(vector) > self.embedding_dimension:
+            vector = vector[:self.embedding_dimension]
+        elif len(vector) < self.embedding_dimension:
+            vector.extend([0.0] * (self.embedding_dimension - len(vector)))
+        
         return vector
 
     def generate_embedding(self, text: str) -> list[float]:

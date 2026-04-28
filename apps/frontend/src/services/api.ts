@@ -63,6 +63,50 @@ export async function sendAgentAction(
   });
 }
 
+export interface SimulatedEmailPayload {
+  customer_email: string;
+  subject: string;
+  body: string;
+  attachments?: File[];
+  thread_id?: string;
+}
+
+export interface SimulatedEmailResponse {
+  ticket_id: string;
+  status: string;
+  email_body?: string;
+  escalated?: boolean;
+  escalation_target?: string;
+}
+
+export async function submitSimulatedEmail(
+  payload: SimulatedEmailPayload,
+): Promise<SimulatedEmailResponse> {
+  const formData = new FormData();
+  formData.append("customer_email", payload.customer_email);
+  formData.append("subject", payload.subject);
+  formData.append("email", payload.body);
+  formData.append("sender", "customer");
+  if (payload.thread_id) {
+    formData.append("thread_id", payload.thread_id);
+  }
+
+  for (const attachment of payload.attachments ?? []) {
+    formData.append("attachments", attachment);
+  }
+
+  const response = await fetch(buildUrl("/ingest/upload"), {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseError(response));
+  }
+
+  return (await response.json()) as SimulatedEmailResponse;
+}
+
 export async function updateEntity(
   ticketId: string,
   entityId: string,

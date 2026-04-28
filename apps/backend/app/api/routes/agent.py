@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 
 from app.repositories.message_repo import create_message
 from app.repositories.supabase_client import get_client
-from app.repositories.ticket_repo import get_ticket_repository
+from app.repositories.ticket_repo import get_ticket_repository, update_ticket
 
 
 router = APIRouter(prefix="/agent", tags=["agent"])
@@ -33,10 +33,7 @@ class AgentActionResponse(BaseModel):
 
 
 def _update_ticket(ticket_id: str, updates: dict[str, Any]) -> None:
-    response = get_client().table("tickets").update(updates).eq("id", ticket_id).execute()
-    rows = getattr(response, "data", None) or []
-    if not rows:
-        raise LookupError(f"Ticket not found: {ticket_id}")
+    update_ticket(ticket_id, updates)
 
 
 @router.post("/action", response_model=AgentActionResponse)

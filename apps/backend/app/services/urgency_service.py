@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from typing import Any, TypedDict
 
 from app.repositories.supabase_client import get_client
-from app.repositories.ticket_repo import get_ticket
+from app.repositories.ticket_repo import get_ticket, update_ticket
 
 
 class UrgencyUpdateInput(TypedDict, total=False):
@@ -79,7 +79,7 @@ class UrgencyService:
         hours_open = max((reference_time - created_at).total_seconds() / 3600.0, 0.0)
         updated_urgency = self._calculate_aged_urgency(previous_urgency, hours_open)
 
-        self._client.table(self.table_name).update({"urgency_score": updated_urgency}).eq("id", ticket_id).execute()
+        update_ticket(ticket_id, {"urgency_score": updated_urgency})
 
         return {
             "ticket_id": ticket_id,

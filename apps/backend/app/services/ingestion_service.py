@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import TypedDict
 
 from app.repositories.message_repo import create_message
-from app.repositories.ticket_repo import create_ticket
+from app.repositories.ticket_repo import create_ticket, get_ticket_repository
 
 
 class IngestionInput(TypedDict, total=False):
@@ -16,6 +16,7 @@ class IngestionInput(TypedDict, total=False):
     subject: str
     body: str
     sender: str
+    thread_id: str | None
 
 
 class IngestionResult(TypedDict):
@@ -37,31 +38,47 @@ class IngestionService:
         subject = (payload.get("subject") or "").strip()
         body = (payload.get("body") or "").strip()
         sender = (payload.get("sender") or "customer").strip() or "customer"
+        thread_id = payload.get("thread_id")
 
         if not customer_email:
             raise ValueError("customer_email is required.")
         if not body:
             raise ValueError("body is required.")
 
-        ticket = create_ticket(
-            {
-                "customer_email": customer_email,
-                "subject": subject,
-                "body": body,
-            }
-        )
+        ticket_id = None
+        created_at = None
+
+        if thread_id:
+            repo = get_ticket_repository()
+            existing_ticket = repo.find_by_thread_id(thread_id)
+            if existing_ticket:
+                ticket_id = existing_ticket["id"]
+                created_at = existing_ticket["created_at"]
+
+        if not ticket_id:
+            ticket = create_ticket(
+                {
+                    "customer_email": customer_email,
+                    "subject": subject,
+                    "body": body,
+                    "thread_id": thread_id,
+                }
+            )
+            ticket_id = ticket["id"]
+            created_at = ticket["created_at"]
+
         message = create_message(
             {
-                "ticket_id": ticket["id"],
+                "ticket_id": ticket_id,
                 "sender": sender,
                 "content": body,
             }
         )
 
         return {
-            "ticket_id": ticket["id"],
+            "ticket_id": ticket_id,
             "message_id": message["id"],
-            "created_at": ticket["created_at"],
+            "created_at": created_at,
             "status": "ingested",
         }
 

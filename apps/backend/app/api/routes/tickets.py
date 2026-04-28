@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
 from app.config import settings
@@ -329,6 +329,23 @@ async def get_ticket_attachment_content(ticket_id: str, attachment_id: str) -> F
     file_url = attachment.get("file_url")
     if not file_url:
         raise HTTPException(status_code=404, detail=f"Attachment file is unavailable: {attachment_id}")
+    # Support Supabase-stored files (supabase://bucket/path) as well as local paths
+    if isinstance(file_url, str) and file_url.startswith("supabase://"):
+        # Format: supabase://{bucket}/{object_path}
+        _, rest = file_url.split("supabase://", 1)
+        parts = rest.split("/", 1)
+        if len(parts) != 2:
+            raise HTTPException(status_code=500, detail="Invalid Supabase file_url format.")
+        bucket, object_path = parts[0], parts[1]
+        try:
+            client = get_client()
+            signed = client.storage.from_(bucket).create_signed_url(object_path, 60)
+            url = signed.get("signedURL") or signed.get("signedUrl") or signed.get("signedURL")
+            if not url:
+                raise RuntimeError("Failed to create signed URL")
+            return RedirectResponse(url)
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
 
     path = Path(file_url).expanduser().resolve()
     if not path.exists() or not path.is_file():

@@ -1,0 +1,2 @@
+product name: baby stroller
+product id: 1234

@@ -8,12 +8,13 @@ from typing import Any, TypedDict
 from app.repositories.supabase_client import get_client
 
 
-class TicketCreateInput(TypedDict):
+class TicketCreateInput(TypedDict, total=False):
     """Required payload for creating a ticket."""
 
     customer_email: str
     subject: str
     body: str
+    thread_id: str | None
 
 
 class TicketRecord(TypedDict, total=False):
@@ -49,15 +50,17 @@ class TicketRepository:
 
     def create_ticket(self, payload: TicketCreateInput) -> dict[str, str]:
         """Insert a ticket and return its identifier plus creation timestamp."""
+        insert_data = {
+            "customer_email": payload["customer_email"],
+            "subject": payload["subject"],
+            "body": payload["body"],
+        }
+        if payload.get("thread_id"):
+            insert_data["thread_id"] = payload["thread_id"]
+
         response = (
             self._client.table(self.table_name)
-            .insert(
-                {
-                    "customer_email": payload["customer_email"],
-                    "subject": payload["subject"],
-                    "body": payload["body"],
-                }
-            )
+            .insert(insert_data)
             .execute()
         )
         row = self._first_row(response)
@@ -65,6 +68,20 @@ class TicketRepository:
             "id": row["id"],
             "created_at": row["created_at"],
         }
+
+    def find_by_thread_id(self, thread_id: str) -> TicketRecord | None:
+        """Find an existing ticket by its thread identifier."""
+        response = (
+            self._client.table(self.table_name)
+            .select("*")
+            .eq("thread_id", thread_id)
+            .limit(1)
+            .execute()
+        )
+        rows = getattr(response, "data", None) or []
+        if not rows:
+            return None
+        return TicketRecord(dict(rows[0]))
 
     def get_ticket(self, ticket_id: str) -> TicketRecord:
         """Fetch a single ticket by id."""
@@ -77,11 +94,22 @@ class TicketRepository:
         )
         return TicketRecord(self._first_row(response))
 
+    def update_ticket(self, ticket_id: str, updates: dict[str, Any]) -> TicketRecord:
+        """Update a ticket and return the updated record."""
+        response = (
+            self._client.table(self.table_name)
+            .update(updates)
+            .eq("id", ticket_id)
+            .execute()
+        )
+        return TicketRecord(self._first_row(response))
+
     def list_tickets(self, limit: int = 50) -> list[TicketRecord]:
-        """Fetch recent tickets for list views and smoke-test inspection."""
+        """Fetch recent tickets, moving resolved ones to the end of the queue."""
         response = (
             self._client.table(self.table_name)
             .select("*")
+            .order("status", desc=True)  # 'resolved' starts with 'r', 'open' with 'o', 'escalated' with 'e'. Desc puts 'resolved' last.
             .order("created_at", desc=True)
             .limit(limit)
             .execute()
@@ -109,4 +137,9 @@ def create_ticket(payload: TicketCreateInput) -> dict[str, str]:
 def get_ticket(ticket_id: str) -> TicketRecord:
     """Compatibility helper matching the technical document wording."""
     return get_ticket_repository().get_ticket(ticket_id)
+
+
+def update_ticket(ticket_id: str, updates: dict[str, Any]) -> TicketRecord:
+    """Compatibility helper for ticket updates."""
+    return get_ticket_repository().update_ticket(ticket_id, updates)
 

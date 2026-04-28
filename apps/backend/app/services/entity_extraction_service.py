@@ -9,7 +9,7 @@ from typing import Any, TypedDict
 from app.llm.client import get_client
 from app.llm.structured_output import validate_structured_output
 from app.rag.retriever import retrieve_relevant_chunks
-from app.repositories.entity_repo import create_entity
+from app.repositories.entity_repo import create_entity, list_entities_for_ticket
 
 
 class EntityExtractionInput(TypedDict, total=False):
@@ -19,6 +19,7 @@ class EntityExtractionInput(TypedDict, total=False):
     body: str
     query: str
     top_k: int
+    context: list[dict[str, str]] | None
 
 
 class ExtractedEntity(TypedDict, total=False):
@@ -185,15 +186,24 @@ class EntityExtractionService:
 
         return entities
 
-    def _build_prompt(self, body: str, rag_chunks: list[str]) -> str:
+    def _build_prompt(self, body: str, rag_chunks: list[str], context: list[dict[str, str]] | None = None) -> str:
+        context_str = ""
+        if context:
+            context_str = "Conversation history:\n"
+            for msg in context:
+                context_str += f"- {msg.get('sender', 'unknown')}: {msg.get('content', '')}\n"
+            context_str += "\n"
+
         rag_block = "\n\n".join(
             f"Attachment chunk {index + 1}:\n{chunk}" for index, chunk in enumerate(rag_chunks)
         )
         return f"""
-You are extracting structured customer-support entities from an email and its related attachment excerpts.
+You are extracting structured customer-support entities from an email interaction and its related attachment excerpts.
 
 Return only information that is explicitly supported by the text. Focus on identifiers and actionable details
 that help reduce unnecessary follow-up requests.
+
+{context_str}
 
 Important examples of useful entities:
 - order_id
@@ -222,12 +232,12 @@ For each entity return:
 Return JSON only in this format:
 {{"entities": [{{"key": "...", "value": "...", "source": "...", "confidence": 0.9}}]}}
 
-Email body:
+Current Email body:
 \"\"\"
 {body}
 \"\"\"
 
-Attachment context:
+Attachment context (derived from indexed files):
 \"\"\"
 {rag_block or "No attachment context available."}
 \"\"\"
@@ -237,8 +247,17 @@ Attachment context:
         """Extract entities, persist them, and return the normalized result."""
         ticket_id = (payload.get("ticket_id") or "").strip()
         body = (payload.get("body") or "").strip()
-        query = (payload.get("query") or body).strip()
-        top_k = int(payload.get("top_k") or 3)
+        context = payload.get("context")
+        
+        # Build an aggressive RAG query combining history and current body to surface all relevant attachment details
+        query_parts = []
+        if context:
+            for msg in context[-3:]:  # Last few messages for focus
+                query_parts.append(msg.get("content", ""))
+        query_parts.append(body)
+        query = "\n".join(query_parts).strip()
+        
+        top_k = int(payload.get("top_k") or 5)  # Increased k for better recall in threads
 
         if not ticket_id:
             raise ValueError("ticket_id is required.")
@@ -250,13 +269,25 @@ Attachment context:
         regex_entities = self._extract_with_regex(body, filtered_rag_chunks)
 
         llm_response = get_client().generate_text(
-            self._build_prompt(body, filtered_rag_chunks),
+            self._build_prompt(body, filtered_rag_chunks, context),
             temperature=0.1,
             expect_json=True,
         )
         validated = validate_structured_output(llm_response["text"], ENTITY_SCHEMA)["validated_json"]
 
+        # Seed merged map with EXISTING entities to prevent "losing" data across interaction turns
+        existing_entities = list_entities_for_ticket(ticket_id)
         merged: dict[tuple[str, str], ExtractedEntity] = {}
+        
+        for entity in existing_entities:
+            normalized = {
+                "key": _normalize_label(entity["key"]),
+                "value": entity["value"].strip(),
+                "source": entity.get("source") or "unknown",
+                "confidence": _clamp_score(entity.get("confidence") or 1.0),
+            }
+            merged[_dedupe_key(normalized)] = normalized
+
         for entity in regex_entities:
             normalized = {
                 "key": _normalize_label(entity["key"]),
@@ -266,7 +297,10 @@ Attachment context:
             }
             if normalized["key"] not in SUPPORTED_ENTITY_KEYS:
                 continue
-            merged[_dedupe_key(normalized)] = normalized
+            dedupe = _dedupe_key(normalized)
+            current = merged.get(dedupe)
+            if current is None or normalized["confidence"] > current["confidence"]:
+                merged[dedupe] = normalized
 
         for entity in validated["entities"]:
             normalized = {
@@ -286,24 +320,50 @@ Attachment context:
 
         persisted_entities: list[ExtractedEntity] = []
         for entity in merged.values():
-            created = create_entity(
-                {
-                    "ticket_id": ticket_id,
-                    "key": entity["key"],
-                    "value": entity["value"],
-                    "source": entity["source"],
-                    "confidence": entity["confidence"],
-                }
+            # Only create NEW entities (that don't have an ID yet) to avoid duplicates in DB
+            # Note: In a real production system we might update existing ones if confidence is higher,
+            # but for this prototype, appending unique key-value pairs is sufficient.
+            
+            # Check if this exact key-value pair already exists in DB to avoid re-insertion
+            # (merged already deduped them locally)
+            exists = any(
+                e["key"] == entity["key"] and e["value"] == entity["value"]
+                for e in existing_entities
             )
-            persisted_entities.append(
-                {
-                    "entity_id": created["id"],
-                    "key": entity["key"],
-                    "value": entity["value"],
-                    "source": entity["source"],
-                    "confidence": entity["confidence"],
-                }
-            )
+            
+            if not exists:
+                created = create_entity(
+                    {
+                        "ticket_id": ticket_id,
+                        "key": entity["key"],
+                        "value": entity["value"],
+                        "source": entity["source"],
+                        "confidence": entity["confidence"],
+                    }
+                )
+                persisted_entities.append(
+                    {
+                        "entity_id": created["id"],
+                        "key": entity["key"],
+                        "value": entity["value"],
+                        "source": entity["source"],
+                        "confidence": entity["confidence"],
+                    }
+                )
+            else:
+                # Find the existing record to include in result
+                for e in existing_entities:
+                    if e["key"] == entity["key"] and e["value"] == entity["value"]:
+                        persisted_entities.append(
+                            {
+                                "entity_id": e["id"],
+                                "key": e["key"],
+                                "value": e["value"],
+                                "source": e.get("source") or "email_body",
+                                "confidence": e.get("confidence") or 1.0,
+                            }
+                        )
+                        break
 
         return {
             "ticket_id": ticket_id,

@@ -15,6 +15,7 @@ class CommunicationInput(TypedDict, total=False):
     confidence: float
     required_fields: list[str]
     ask_for_info: bool
+    context: list[dict[str, str]] | None
 
 
 class CommunicationResult(TypedDict):
@@ -77,6 +78,11 @@ class CommunicationService:
         confidence = float(payload.get("confidence") or 0.0)
         required_fields = [_normalize_label(field) for field in (payload.get("required_fields") or [])]
         ask_for_info = bool(payload.get("ask_for_info"))
+        context = payload.get("context")
+
+        if context and len(context) > 0:
+            # Use LLM for context-aware response when history exists
+            return self._generate_context_aware_email(payload)
 
         if confidence >= 0.75:
             opening = (
@@ -103,7 +109,45 @@ class CommunicationService:
         else:
             email_body = opening
 
+        email_body = f"{email_body.strip()}\n\n---\nThis response is AI generated"
+
         return {"email_body": email_body.strip()}
+
+    def _generate_context_aware_email(self, payload: CommunicationInput) -> CommunicationResult:
+        """Use Gemini to generate a response that respects the conversation history."""
+        context = payload.get("context") or []
+        context_str = "Conversation history:\n"
+        for msg in context:
+            context_str += f"- {msg.get('sender', 'unknown')}: {msg.get('content', '')}\n"
+
+        prompt = f"""
+You are a helpful customer support agent. Generate a concise, context-aware response to the customer.
+
+{context_str}
+Current Situation:
+- Intent: {payload.get('intent')}
+- Category: {payload.get('category')}
+- Sentiment: {payload.get('sentiment')}
+- Missing Info: {', '.join(payload.get('required_fields', [])) if payload.get('ask_for_info') else 'None'}
+
+Guidelines:
+- Acknowledge previous points if the customer just provided them.
+- Be empathetic if the sentiment is frustrated.
+- If 'Missing Info' is not 'None', politely ask for the missing details.
+- Keep it under 3-4 sentences.
+- Do not use placeholders like [Name].
+- End with a professional closing.
+- Do not include the "AI generated" warning here; it will be added by the service.
+
+Response:
+""".strip()
+
+        from app.llm.client import get_client
+        response = get_client().generate_text(prompt, temperature=0.7)
+        email_body = response["text"].strip()
+        email_body = f"{email_body}\n\n---\nThis response is AI generated"
+        
+        return {"email_body": email_body}
 
 
 _service: CommunicationService | None = None
@@ -120,4 +164,3 @@ def get_communication_service() -> CommunicationService:
 def generate_email(payload: CommunicationInput) -> CommunicationResult:
     """Compatibility helper matching the technical document wording."""
     return get_communication_service().generate_email(payload)
-

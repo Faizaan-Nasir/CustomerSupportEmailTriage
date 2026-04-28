@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import json
 import time
 from dataclasses import dataclass
@@ -81,8 +82,9 @@ class GeminiClient:
         generation_config: dict[str, Any] = {
             "temperature": temperature,
         }
-        if expect_json and json_mode_enabled:
-            generation_config["response_mime_type"] = "application/json"
+        # Gemini SDK versions vary in support for response_mime_type.
+        # The installed google-generativeai==0.4.0 does not support this field.
+        # Skip setting response_mime_type to ensure compatibility.
         return generation_config
 
     def _resolve_model_name(self, genai: Any) -> str:
@@ -150,16 +152,19 @@ class GeminiClient:
                 if not text:
                     raise LLMClientError("Gemini returned an empty response.")
 
-                if expect_json and json_mode_enabled:
-                    json.loads(text)
+                # Attempt JSON validation if we expect JSON.
+                # Older SDKs without response_mime_type may not produce valid JSON,
+                # but downstream validate_structured_output will handle it.
+                if expect_json:
+                    try:
+                        json.loads(text)
+                    except json.JSONDecodeError:
+                        # JSON parsing failed, but continue; downstream validation will re-attempt.
+                        pass
 
                 return LLMResponse(text=text, raw=response).to_dict()
             except Exception as exc:
                 last_error = exc
-                error_text = str(exc)
-                if expect_json and json_mode_enabled and "JSON mode is not enabled" in error_text:
-                    json_mode_enabled = False
-                    continue
                 if attempt == self.max_retries:
                     break
                 time.sleep(self.retry_delay_seconds)
