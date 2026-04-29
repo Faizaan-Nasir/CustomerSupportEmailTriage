@@ -1,0 +1,122 @@
+[
+  {
+    "id": "eval_01",
+    "language": "en",
+    "subject": "Refund request for spoiled milk",
+    "body": "The baby milk I bought yesterday is expired. My baby got sick. I want a full refund immediately.",
+    "expected": {
+      "intent": "request_refund",
+      "category": "product_issue",
+      "sentiment": "urgent",
+      "urgency_min": 0.8
+    }
+  },
+  {
+    "id": "eval_02",
+    "language": "ar",
+    "subject": "شكوى بخصوص عربة تالفة",
+    "body": "السلام عليكم، استلمت العربة اليوم ولكن العجلات مكسورة ولا يمكن استخدامها. أرجو استبدالها.",
+    "expected": {
+      "intent": "complaint",
+      "category": "product_issue",
+      "sentiment": "frustrated",
+      "urgency_min": 0.6
+    }
+  },
+  {
+    "id": "eval_03",
+    "language": "en",
+    "subject": "Where is my order?",
+    "body": "I ordered a stroller 10 days ago and it still hasn't arrived. Tracking says it is stuck in transit.",
+    "expected": {
+      "intent": "general_inquiry",
+      "category": "shipping_issue",
+      "sentiment": "frustrated",
+      "urgency_min": 0.4
+    }
+  },
+  {
+    "id": "eval_04",
+    "language": "ar",
+    "subject": "تغيير عنوان التوصيل",
+    "body": "أريد تغيير عنوان الشحن لطلبي رقم 12345. العنوان الجديد هو شارع الملك فهد.",
+    "expected": {
+      "intent": "clarification_request",
+      "category": "shipping_issue",
+      "sentiment": "neutral",
+      "urgency_min": 0.3
+    }
+  },
+  {
+    "id": "eval_05",
+    "language": "en",
+    "subject": "Double charge on my card",
+    "body": "I see two identical charges for my last order on my bank statement. Please fix this.",
+    "expected": {
+      "intent": "complaint",
+      "category": "billing_issue",
+      "sentiment": "frustrated",
+      "urgency_min": 0.7
+    }
+  },
+  {
+    "id": "eval_06",
+    "language": "en",
+    "subject": "Great weather today",
+    "body": "Just wanted to say that the sun is shining and I hope you have a nice day!",
+    "expected": {
+      "intent": "unrelated",
+      "category": "unrelated",
+      "sentiment": "neutral",
+      "urgency_max": 0.2
+    }
+  },
+  {
+    "id": "eval_07",
+    "language": "ar",
+    "subject": "مرحبا",
+    "body": "كيف حالكم اليوم؟",
+    "expected": {
+      "intent": "unrelated",
+      "category": "unrelated",
+      "sentiment": "neutral",
+      "urgency_max": 0.2
+    }
+  },
+  {
+    "id": "eval_08",
+    "language": "en",
+    "subject": "Problem",
+    "body": "I have a problem with something I bought. Call me.",
+    "expected": {
+      "intent": "uncertain",
+      "category": "uncertain",
+      "sentiment": "neutral",
+      "urgency_max": 0.4
+    }
+  },
+  {
+    "id": "eval_09",
+    "language": "ar",
+    "subject": "طلب استرجاع",
+    "body": "أريد استرجاع المبلغ المدفوع لأن المنتج لم يعجبني.",
+    "expected": {
+      "intent": "request_refund",
+      "category": "billing_issue",
+      "sentiment": "neutral",
+      "urgency_min": 0.4
+    }
+  },
+  {
+    "id": "eval_10",
+    "language": "en",
+    "subject": "Login issues",
+    "body": "I cannot access my account. I reset my password but it still doesn't work.",
+    "expected": {
+      "intent": "complaint",
+      "category": "account_issue",
+      "sentiment": "frustrated",
+      "urgency_min": 0.5
+    }
+  }
+]

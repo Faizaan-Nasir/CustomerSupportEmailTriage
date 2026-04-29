@@ -39,11 +39,9 @@ def _read_env_file(path: Path) -> dict[str, str]:
 def _merge_env_sources() -> dict[str, str]:
     """Merge environment sources, preferring project-local env files."""
     backend_root = Path(__file__).resolve().parents[1]
-    repo_root = Path(__file__).resolve().parents[3]
 
     merged: dict[str, str] = {}
     merged.update(os.environ)
-    merged.update(_read_env_file(repo_root / ".env"))
     merged.update(_read_env_file(backend_root / ".env"))
     return merged
 
