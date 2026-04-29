@@ -69,6 +69,17 @@ class DecisionService:
 
         has_missing_info = bool(required_fields)
         within_interaction_limit = interaction_count < self.interaction_limit
+        
+        # Priority Escalation: If urgency is very high, escalate immediately regardless of missing info
+        if urgency >= 0.8 and category in ESCALATION_TARGETS:
+            return {
+                "ask_for_info": False,
+                "escalate": True,
+                "continue_automation": False,
+                "escalation_target": ESCALATION_TARGETS[category],
+                "reason": f"Urgency score ({urgency}) exceeds critical threshold. Escalating immediately to {ESCALATION_TARGETS[category]}.",
+            }
+
         ask_for_info = has_missing_info and within_interaction_limit
 
         if ask_for_info:

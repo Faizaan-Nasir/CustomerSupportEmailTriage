@@ -190,6 +190,27 @@ After getting a working prototype, an additional 2 hours had been spent on addin
 
 ---
 
+## System Performance and Future Outlook
+
+### Current Strengths
+The prototype already demonstrates several robust capabilities:
+- **Multilingual Support:** Handles English and Arabic natively with high contextual accuracy, avoiding the pitfalls of machine translation.
+- **Urgency-Driven Triage:** Effectively prioritizes high-stakes issues (like security threats or billing errors) for immediate human escalation.
+- **Cautious Interpretation:** A key design feature is that the LLM is instructed to side with a **lower confidence score** when it is unsure about a decision. This "cautious-by-default" approach is a significant advantage, as it prevents the system from taking incorrect automated actions on ambiguous tickets, instead opting to ask the customer for clarifying details.
+- **Subject-Line Awareness:** Intelligent extraction of entities from both the subject and body reduces redundant back-and-forth.
+
+### Areas for Improvement
+- **Edge-Case Confidence:** While generally cautious, the system can sometimes exhibit overconfidence when latching onto emotional keywords in messages that otherwise lack factual data. Further prompt engineering is needed to enforce stricter "drop confidence" rules.
+- **Full Email Integration:** Completing the OAuth 2.0 flow for direct Gmail/Outlook integration would move the project from a simulator to a production-ready tool.
+
+### Future Area of Improvement: LLM Fine-tuning
+A major next step for this project would be the **fine-tuning of the underlying LLM**. By training the model on specific, historical support data from a particular retail domain, we could:
+- Improve the accuracy of domain-specific entity extraction.
+- Align the "intent" and "category" labels more closely with a specific company's internal taxonomy.
+- Reduce the computational cost and latency by using smaller, specialized models that perform as well as (or better than) larger general-purpose models for this specific task.
+
+---
+
 ## Final Notes
 
 This markdown file was also generated with the help of ChatGPT, mainly to reduce time spent on formatting.

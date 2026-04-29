@@ -17,6 +17,7 @@ class EntityExtractionInput(TypedDict, total=False):
 
     ticket_id: str
     body: str
+    subject: str
     query: str
     top_k: int
     context: list[dict[str, str]] | None
@@ -165,8 +166,8 @@ def _relevant_attachment_context(body: str, rag_chunks: list[str], *, line_limit
 class EntityExtractionService:
     """Extract structured entities from email body content and retrieved attachments."""
 
-    def _extract_with_regex(self, body: str, rag_chunks: list[str]) -> list[ExtractedEntity]:
-        combined_text = "\n".join([body, *rag_chunks])
+    def _extract_with_regex(self, body: str, subject: str, rag_chunks: list[str]) -> list[ExtractedEntity]:
+        combined_text = "\n".join([subject, body, *rag_chunks])
         entities: list[ExtractedEntity] = []
 
         for key, pattern in REGEX_PATTERNS.items():
@@ -174,7 +175,14 @@ class EntityExtractionService:
                 value = match.group(1).strip()
                 if not _looks_like_specific_value(value):
                     continue
-                source = "email_body" if match.start() < len(body) else "rag_attachment"
+                # Determine source based on where the match was found
+                if match.start() < len(subject):
+                    source = "email_subject"
+                elif match.start() < len(subject) + len(body) + 1:
+                    source = "email_body"
+                else:
+                    source = "rag_attachment"
+
                 entities.append(
                     {
                         "key": key,
@@ -186,7 +194,7 @@ class EntityExtractionService:
 
         return entities
 
-    def _build_prompt(self, body: str, rag_chunks: list[str], context: list[dict[str, str]] | None = None) -> str:
+    def _build_prompt(self, body: str, subject: str, rag_chunks: list[str], context: list[dict[str, str]] | None = None) -> str:
         context_str = ""
         if context:
             context_str = "Conversation history:\n"
@@ -226,11 +234,16 @@ Restrictions:
 For each entity return:
 - key: normalized snake_case label
 - value: exact extracted value when possible
-- source: one of email_body or rag_attachment
+- source: one of email_subject, email_body, or rag_attachment
 - confidence: a score from 0.0 to 1.0
 
 Return JSON only in this format:
 {{"entities": [{{"key": "...", "value": "...", "source": "...", "confidence": 0.9}}]}}
+
+Current Email Subject:
+\"\"\"
+{subject}
+\"\"\"
 
 Current Email body:
 \"\"\"
@@ -247,6 +260,7 @@ Attachment context (derived from indexed files):
         """Extract entities, persist them, and return the normalized result."""
         ticket_id = (payload.get("ticket_id") or "").strip()
         body = (payload.get("body") or "").strip()
+        subject = (payload.get("subject") or "").strip()
         context = payload.get("context")
         
         # Build an aggressive RAG query combining history and current body to surface all relevant attachment details
@@ -254,6 +268,7 @@ Attachment context (derived from indexed files):
         if context:
             for msg in context[-3:]:  # Last few messages for focus
                 query_parts.append(msg.get("content", ""))
+        query_parts.append(subject)
         query_parts.append(body)
         query = "\n".join(query_parts).strip()
         
@@ -266,10 +281,10 @@ Attachment context (derived from indexed files):
 
         rag_chunks = retrieve_relevant_chunks(query=query, ticket_id=ticket_id, top_k=top_k)["chunks"]
         filtered_rag_chunks = _relevant_attachment_context(body, rag_chunks)
-        regex_entities = self._extract_with_regex(body, filtered_rag_chunks)
+        regex_entities = self._extract_with_regex(body, subject, filtered_rag_chunks)
 
         llm_response = get_client().generate_text(
-            self._build_prompt(body, filtered_rag_chunks, context),
+            self._build_prompt(body, subject, filtered_rag_chunks, context),
             temperature=0.1,
             expect_json=True,
         )

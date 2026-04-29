@@ -1,122 +1,122 @@
 [
   {
-    "id": "eval_01",
+    "id": "eval_new_01",
     "language": "en",
-    "subject": "Refund request for spoiled milk",
-    "body": "The baby milk I bought yesterday is expired. My baby got sick. I want a full refund immediately.",
-    "expected": {
-      "intent": "request_refund",
-      "category": "product_issue",
-      "sentiment": "urgent",
-      "urgency_min": 0.8
-    }
-  },
-  {
-    "id": "eval_02",
-    "language": "ar",
-    "subject": "شكوى بخصوص عربة تالفة",
-    "body": "السلام عليكم، استلمت العربة اليوم ولكن العجلات مكسورة ولا يمكن استخدامها. أرجو استبدالها.",
+    "subject": "Incomplete Furniture Set - Missing Hardware for Order #FUR-4433",
+    "body": "Hello, I recently ordered the 'Scandinavian Modern Oak Dining Table' (Order #FUR-4433) and it was delivered this morning. The wood quality is lovely, but I have a major problem. When I started the assembly process, I realized that the entire hardware packet—screws, bolts, and the hex key—is missing from the box. I've double-checked all the padding and cardboard inserts, but it's definitely not there. I now have large pieces of a table taking up my entire living room floor and I cannot put them together. This is incredibly frustrating as I have guests coming for dinner tomorrow night. Can you please overnight the missing hardware kit to me? If that's not possible, I'll need a technician to come and assemble it with their own tools. Please advise on how you will resolve this quickly. Thank you, Mark Thompson.",
     "expected": {
       "intent": "complaint",
       "category": "product_issue",
       "sentiment": "frustrated",
-      "urgency_min": 0.6
+      "urgency": "medium"
     }
   },
   {
-    "id": "eval_03",
+    "id": "eval_new_02",
+    "language": "ar",
+    "subject": "طلب إلغاء اشتراك واسترداد مبلغ - رقم الحساب 998877",
+    "body": "إلى فريق خدمة العملاء، أكتب إليكم لطلب إلغاء اشتراكي في باقة 'المتسوق المميز' فوراً. لقد لاحظت أنه تم خصم رسوم التجديد السنوي من بطاقتي الائتمانية يوم أمس دون أي إشعار مسبق. أنا لم أعد أستخدم هذه الخدمة منذ عدة أشهر ولا أرغب في تجديدها لعام آخر. أطلب منكم استرداد مبلغ 199 ريال الذي تم خصمه وإعادة تأكيد حالة حسابي كحساب عادي غير مشترك. لقد كنت زبوناً لديكم لفترة طويلة وأتمنى أن يتم التعامل مع هذا الطلب بسلاسة دون الحاجة لتصعيد المشكلة مع البنك. بانتظار ردكم وتأكيد عملية الاسترداد. مع الشكر، فاطمة حسن.",
+    "expected": {
+      "intent": "request_refund",
+      "category": "billing_issue",
+      "sentiment": "neutral",
+      "urgency": "medium"
+    }
+  },
+  {
+    "id": "eval_new_03",
     "language": "en",
-    "subject": "Where is my order?",
-    "body": "I ordered a stroller 10 days ago and it still hasn't arrived. Tracking says it is stuck in transit.",
+    "subject": "Wrong item delivered for the second time! Order #RPT-0091",
+    "body": "I am absolutely fuming. I received my replacement order #RPT-0091 today after the first one was wrong, and guess what? IT IS WRONG AGAIN. I originally ordered a pair of noise-canceling headphones (Model QC-35), but you sent me a basic earbud model both times. How does this even happen twice in a row? Do your warehouse staff even look at the barcodes? This is a total lack of quality control. I have spent hours on hold and driving to the post office to return these incorrect items. I want an immediate explanation and I want the correct headphones sent via the fastest possible method. I am not paying for any more return shipping. If this isn't fixed today, I am taking my business elsewhere and leaving a 1-star review everywhere. This is unacceptable. James O'Connor.",
+    "expected": {
+      "intent": "complaint",
+      "category": "product_issue",
+      "sentiment": "frustrated",
+      "urgency": "high"
+    }
+  },
+  {
+    "id": "eval_new_04",
+    "language": "ar",
+    "subject": "تأخر الشحنة في الجمارك - طلب رقم 66554",
+    "body": "مرحباً، أتابع حالة طلبي رقم 66554 منذ ثلاثة أيام، وتظهر لي رسالة في موقع التتبع تقول 'بانتظار التخليص الجمركي'. هذه هي المرة الأولى التي يحدث فيها هذا معي عند الطلب من متجركم. هل هناك أوراق ناقصة أو مبالغ إضافية يجب علي دفعها؟ الشحنة تحتوي على ملابس أطفال وهدايا لعيد ميلاد ابني الذي سيصادف يوم الثلاثاء القادم. أخشى أن يطول الانتظار وتضيع المناسبة. هل يمكنكم التواصل مع شركة الشحن ومعرفة ما إذا كان بإمكاني فعل أي شيء لتسريع العملية؟ أقدر تعاونكم الدائم. تحياتي، محمد خالد.",
     "expected": {
       "intent": "general_inquiry",
       "category": "shipping_issue",
-      "sentiment": "frustrated",
-      "urgency_min": 0.4
+      "sentiment": "anxious",
+      "urgency": "medium"
     }
   },
   {
-    "id": "eval_04",
-    "language": "ar",
-    "subject": "تغيير عنوان التوصيل",
-    "body": "أريد تغيير عنوان الشحن لطلبي رقم 12345. العنوان الجديد هو شارع الملك فهد.",
-    "expected": {
-      "intent": "clarification_request",
-      "category": "shipping_issue",
-      "sentiment": "neutral",
-      "urgency_min": 0.3
-    }
-  },
-  {
-    "id": "eval_05",
+    "id": "eval_new_05",
     "language": "en",
-    "subject": "Double charge on my card",
-    "body": "I see two identical charges for my last order on my bank statement. Please fix this.",
+    "subject": "Feedback on your mobile app's latest update",
+    "body": "Hi there, I've been using your retail app for over two years now, and I wanted to provide some constructive feedback on the version 4.0 update that rolled out yesterday. While the new dark mode looks fantastic and the checkout flow feels slightly snappier, the removal of the 'Wishlist' shortcut from the bottom navigation bar is a step backward for usability. It now takes three taps to get to my saved items instead of one. Also, the new font size in the product descriptions is a bit too small for comfortable reading. I hope your product team considers these points for the next patch. Other than that, I love the service! Cheers, Emily Watson.",
     "expected": {
-      "intent": "complaint",
-      "category": "billing_issue",
-      "sentiment": "frustrated",
-      "urgency_min": 0.7
-    }
-  },
-  {
-    "id": "eval_06",
-    "language": "en",
-    "subject": "Great weather today",
-    "body": "Just wanted to say that the sun is shining and I hope you have a nice day!",
-    "expected": {
-      "intent": "unrelated",
+      "intent": "general_inquiry",
       "category": "unrelated",
       "sentiment": "neutral",
-      "urgency_max": 0.2
+      "urgency": "low"
     }
   },
   {
-    "id": "eval_07",
+    "id": "eval_new_06",
     "language": "ar",
-    "subject": "مرحبا",
-    "body": "كيف حالكم اليوم؟",
+    "subject": "اقتراح بخصوص التغليف المستدام",
+    "body": "السلام عليكم، أنا من محبي التسوق من متجركم ولكن لدي ملاحظة بسيطة بخصوص التغليف. لاحظت في طلبياتي الأخيرة استخدام كميات كبيرة جداً من البلاستيك والنايلون لتغليف منتجات غير قابلة للكسر. بصفتي مهتمة بالبيئة، أقترح عليكم توفير خيار 'التغليف الصديق للبيئة' عند الدفع، حيث يتم استخدام الكرتون المعاد تدويره فقط. العديد من المتاجر العالمية بدأت في تطبيق هذه الفكرة وهي تلقى رواجاً كبيراً. أتمنى أن أرى هذه المبادرة في متجركم قريباً للمساهمة في تقليل النفايات البلاستيكية. شكراً لاهتمامكم، مريم.",
     "expected": {
-      "intent": "unrelated",
+      "intent": "general_inquiry",
       "category": "unrelated",
       "sentiment": "neutral",
-      "urgency_max": 0.2
+      "urgency": "low"
     }
   },
   {
-    "id": "eval_08",
+    "id": "eval_new_07",
     "language": "en",
-    "subject": "Problem",
-    "body": "I have a problem with something I bought. Call me.",
-    "expected": {
-      "intent": "uncertain",
-      "category": "uncertain",
-      "sentiment": "neutral",
-      "urgency_max": 0.4
-    }
-  },
-  {
-    "id": "eval_09",
-    "language": "ar",
-    "subject": "طلب استرجاع",
-    "body": "أريد استرجاع المبلغ المدفوع لأن المنتج لم يعجبني.",
-    "expected": {
-      "intent": "request_refund",
-      "category": "billing_issue",
-      "sentiment": "neutral",
-      "urgency_min": 0.4
-    }
-  },
-  {
-    "id": "eval_10",
-    "language": "en",
-    "subject": "Login issues",
-    "body": "I cannot access my account. I reset my password but it still doesn't work.",
+    "subject": "Security Concern: Unauthorized Login Attempt",
+    "body": "Urgent Security Notice: I received an automated email from your system about an hour ago stating that there was a login to my account from an unrecognized device in a different country. I immediately changed my password, but I am worried that my saved credit card information might have been compromised. Can you please check if any orders were placed in the last few hours that I am not aware of? Also, I would like to request that my account be temporarily frozen until I can verify all the details. This is very concerning as I have a significant store credit balance. Please get back to me as soon as possible with a status update on my account security. Regards, Robert Garcia.",
     "expected": {
       "intent": "complaint",
       "category": "account_issue",
-      "sentiment": "frustrated",
-      "urgency_min": 0.5
+      "sentiment": "urgent",
+      "urgency": "high"
+    }
+  },
+  {
+    "id": "eval_new_08",
+    "language": "ar",
+    "subject": "استفسار عن سياسة الضمان للأجهزة الإلكترونية",
+    "body": "أهلاً بك فريق الدعم، أخطط لشراء جهاز 'لابتوب' جديد من متجركم الإلكتروني، ولكن قبل إتمام العملية أود التأكد من تفاصيل الضمان. هل الضمان يشمل العيوب المصنعية فقط أم يغطي أيضاً الأضرار العرضية مثل انسكاب السوائل؟ وهل يمكنني تمديد فترة الضمان لسنة إضافية مقابل مبلغ مادي؟ أيضاً، في حال حدوث مشكلة، هل يتوجب علي إرسال الجهاز إليكم بالبريد أم أن لديكم مراكز صيانة معتمدة في مدينة الرياض يمكنني زيارتها؟ أرجو تزويدي بالمعلومات الكافية لأتمكن من اتخاذ قرار الشراء. شكراً لكم، عمر.",
+    "expected": {
+      "intent": "general_inquiry",
+      "category": "product_issue",
+      "sentiment": "neutral",
+      "urgency": "low"
+    }
+  },
+  {
+    "id": "eval_new_09",
+    "language": "en",
+    "subject": "Collaborative Partnership Proposal - TechInsights Blog",
+    "body": "Dear Marketing Manager, My name is Jennifer and I run 'TechInsights', a growing lifestyle and technology blog with over 50,000 monthly active readers. We are currently planning our 'Summer Home Essentials' feature and we would love to feature some of your smart home products. We offer various collaboration tiers, including dedicated review articles, social media shoutouts, and inclusion in our weekly newsletter. I believe your brand aligns perfectly with our audience demographics. Would you be interested in a partnership? I have attached our media kit for your perusal. Looking forward to a potential collaboration. Best, Jennifer Lee.",
+    "expected": {
+      "intent": "unrelated",
+      "category": "unrelated",
+      "sentiment": "neutral",
+      "urgency": "low"
+    }
+  },
+  {
+    "id": "eval_new_10",
+    "language": "ar",
+    "subject": "مشكلة في تطبيق كود الخصم - طلب قيد التنفيذ",
+    "body": "مرحباً، أحاول إتمام عملية شراء لمجموعة من الكتب، ولدي كود خصم 'WELCOME20' الذي استلمته في بريدي الإلكتروني كترحيب بانضمامي للمتجر. المشكلة هي أنه كلما أدخلت الكود تظهر لي رسالة 'الكود غير صالح' رغم أنني لم أستخدمه من قبل وقيمة مشترياتي تتجاوز الحد الأدنى المطلوب. لقد حاولت تحديث الصفحة واستخدام متصفح آخر ولكن دون جدوى. أريد إتمام الطلب قبل نفاد الكمية، فهل يمكنكم تفعيل الخصم لي يدوياً أو تزويدي بكود بديل يعمل؟ بانتظار ردكم السريع، سارة.",
+    "expected": {
+      "intent": "complaint",
+      "category": "billing_issue",
+      "sentiment": "neutral",
+      "urgency": "medium"
     }
   }
 ]

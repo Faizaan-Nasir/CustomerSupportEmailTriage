@@ -122,7 +122,7 @@ async def ingest_ticket(payload: IngestRequest) -> IngestResponse:
             _index_attachments(ticket_id, payload.attachments, payload.email)
 
         interpretation = interpret_email({"ticket_id": ticket_id, "body": payload.email, "context": context})
-        extraction = extract_entities({"ticket_id": ticket_id, "body": payload.email, "context": context})
+        extraction = extract_entities({"ticket_id": ticket_id, "body": payload.email, "subject": payload.subject, "context": context})
         requirements = infer_requirements(
             {
                 "intent": interpretation["intent"],
@@ -212,7 +212,7 @@ async def ingest_uploaded_ticket(
             await _save_uploaded_attachments(ticket_id, attachments, email)
 
         interpretation = interpret_email({"ticket_id": ticket_id, "body": email, "context": context})
-        extraction = extract_entities({"ticket_id": ticket_id, "body": email, "context": context})
+        extraction = extract_entities({"ticket_id": ticket_id, "body": email, "subject": subject, "context": context})
         requirements = infer_requirements(
             {
                 "intent": interpretation["intent"],

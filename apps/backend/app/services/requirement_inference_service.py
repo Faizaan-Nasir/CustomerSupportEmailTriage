@@ -26,6 +26,7 @@ REQUIREMENT_RULES: dict[str, list[str]] = {
     "product_issue": ["product_name", "order_date"],
     "account_issue": ["account_email"],
     "refund_request": ["order_id", "invoice_id", "transaction_reference"],
+    "request_refund": ["order_id", "invoice_id", "transaction_reference"],
     "complaint": ["order_id"],
 }
 

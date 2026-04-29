@@ -4,6 +4,10 @@
 **/.env.*
 *.env
 *.env.*
+
+# Allow env templates to be committed
+!.env.example
+!**/.env.example
 node_modules/
 __pycache__/
 *.pyc
