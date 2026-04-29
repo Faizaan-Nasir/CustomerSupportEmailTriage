@@ -72,6 +72,10 @@ CATEGORY_ALIASES: dict[str, str] = {
     "account_issue": "account_issue",
     "account_access": "account_issue",
     "login_issue": "account_issue",
+    "unrelated": "unrelated",
+    "spam": "unrelated",
+    "other": "unrelated",
+    "personal": "unrelated",
 }
 
 INTENT_ALIASES: dict[str, str] = {
@@ -143,6 +147,7 @@ Assume the role of a customer support analyst interpreting the customer's curren
 
 Your output becomes the single source of truth for downstream actions, so it must
 be consistent, cautious, and grounded in the entire interaction history.
+If the email is ambiguous, it's better to be uncertain than to guess. Always follow the guidelines and never return labels outside of the specified sets.
 
 {context_str}Current message from customer:
 \"\"\"
@@ -160,9 +165,10 @@ Interpret the interaction across the following dimensions:
 Guidelines:
 - Prefer normalized snake_case labels for intent, category, and sentiment.
 - Use only one of these category labels:
-    billing_issue, shipping_issue, product_issue, account_issue, complaint, general_inquiry
+    billing_issue, shipping_issue, product_issue, account_issue, complaint, general_inquiry, unrelated
 - When the message is about refunds, double charges, invoices, payments, or transaction problems,
     use category billing_issue instead of alternate names like billing or billing_and_payments.
+- If the email is totally unrelated to the product, shopping, or legitimate support needs (e.g. general chatter, spam, or random prompts), categorize it as "unrelated" and provide a low confidence score.
 - Use only one of these intent labels when applicable:
     request_refund, complaint, clarification_request, general_inquiry
 - Use only one of these sentiment labels when applicable:
