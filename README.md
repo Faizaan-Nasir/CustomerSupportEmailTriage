@@ -6,27 +6,37 @@ The **Intelligent Customer Support Email Triage & Action System** is a unified, 
 
 ## 2. Tech Stack
 
+### AI & Reasoning
+- **Primary LLM**: Google Gemini (Flash & Pro models via Google AI Studio)
+- **Embeddings**: Gemini Text Embedding models (for RAG)
+- **Multilingual Support**: Direct native support for Arabic and English
+
 ### Backend
 - **Framework**: FastAPI (Python 3.13)
-- **LLM Reasoning**: Google Gemini (via `google-generativeai`)
-- **Database & Auth**: Supabase (PostgreSQL)
-- **Vector Search**: pgvector (for RAG)
-- **Document Processing**: PyMuPDF, pdfplumber (PDF parsing), Tesseract OCR (Image text extraction)
-- **Environment Management**: `python-dotenv`
+- **Database**: Supabase (PostgreSQL)
+- **Vector Search**: pgvector
+- **Document Processing**: PyMuPDF, pdfplumber, Tesseract OCR
 
 ### Frontend
 - **Framework**: React (Vite)
 - **Language**: TypeScript
 - **State Management**: Zustand
-- **Styling**: Vanilla CSS (Modern, decision-focused UI)
-- **API Interaction**: Fetch API
+- **Styling**: Vanilla CSS
 
-### Infrastructure & DevOps
+### Infrastructure
 - **Containerization**: Docker, Docker Compose
-- **Cloud Services**: Supabase (Database, Storage, Edge Functions)
-- **Version Control**: Git
+- **Cloud Services**: Supabase (Database, Storage)
 
-## 3. Basic Installation Guide
+## 3. AI Integration & Development Tools
+
+The development of this system was accelerated and optimized using a suite of AI-powered tools across different project phases:
+
+- **Reasoning & Intelligence**: **Google Gemini** (via Google AI Studio) powers the core interpretation engine, context-aware communication, and RAG retrieval.
+- **Project Structuring & Documentation**: **ChatGPT (OpenAI)** was used for idea validation, refining the problem statement, and generating structured documentation (`Proposed_Solution.md` and `Technical_Document.md`).
+- **Coding Assistance**: **GitHub Copilot** and **OpenAI CodeX** provided real-time implementation support and boilerplate generation.
+- **Workflow Orchestration**: **Gemini CLI** was utilized for specialized codebase analysis, automated refactoring, and maintaining architectural consistency during development.
+
+## 4. Basic Installation Guide
 
 ### Prerequisites
 - Python 3.13+
@@ -75,7 +85,7 @@ docker-compose up --build
 - **Backend**: `uvicorn app.main:app --reload --port 8000` (from `apps/backend`)
 - **Frontend**: `npm run dev` (from `apps/frontend`)
 
-## 4. Supabase Relationship Schema
+## 5. Supabase Relationship Schema
 
 The system uses a highly relational PostgreSQL schema on Supabase to maintain a single source of truth across all pipeline stages. All child tables are linked to the primary `tickets` table, ensuring that interpretation, extraction, and history are perfectly synchronized.
 
@@ -156,6 +166,6 @@ erDiagram
 - **pgvector**: Enables semantic similarity search across attachments for RAG extraction.
 - **Optimized Indexing**: Employs targeted B-tree indexes across critical query paths to ensure low-latency dashboard updates and high-performance triage as the system scales.
 
-## 5. Conclusion
+## 6. Conclusion
 
 The **Intelligent Customer Support Email Triage & Action System** represents a shift from reactive helpdesk tools to a coordinated, proactive decision system. By leveraging Large Language Models for deep interpretation and RAG for document intelligence, the system successfully bridges the gap between raw customer input and actionable resolution. This architecture not only speeds up response times but also ensures that support operations are consistent, fair, and data-driven.
