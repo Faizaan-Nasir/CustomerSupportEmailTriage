@@ -153,8 +153,12 @@ class Settings:
     def from_env(cls) -> "Settings":
         values = _merge_env_sources()
 
-        backend_root = Path(__file__).resolve().parents[1]
-        repo_root = Path(__file__).resolve().parents[3]
+        file_path = Path(__file__).resolve()
+        backend_root = file_path.parents[1]
+        try:
+            repo_root = file_path.parents[3]
+        except IndexError:
+            repo_root = backend_root
 
         smtp_host = _get_first(values, "SMTP_HOST")
         smtp_port_raw = _get_first(values, "SMTP_PORT")
