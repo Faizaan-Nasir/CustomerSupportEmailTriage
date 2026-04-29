@@ -268,7 +268,12 @@ You may get information in Arabic as well, you should still respond in English a
             }
         )
 
-        update_ticket(ticket_id, {"urgency_score": normalized_output["urgency"]})
+        from app.repositories.ticket_repo import get_ticket
+        ticket = get_ticket(ticket_id)
+        # Only update urgency if it's the first interpretation or wasn't set (default 0 or small)
+        # We check if urgency_score is 0.0 or None, assuming first email defines it.
+        if not ticket.get("urgency_score"):
+            update_ticket(ticket_id, {"urgency_score": normalized_output["urgency"]})
 
         return {
             "interpretation_id": persisted["id"],

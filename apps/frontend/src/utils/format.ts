@@ -11,7 +11,14 @@ export function formatLabel(value: string | null | undefined): string {
 
 export function formatRelativeTime(value: string): string {
   const date = new Date(value);
-  const deltaMs = date.getTime() - Date.now();
+  let deltaMs = date.getTime() - Date.now();
+  
+  // If the time is in the future (due to clock skew between client/server), 
+  // or extremely recent (less than 10 seconds ago), return "just now".
+  if (deltaMs > -10000) {
+    return "just now";
+  }
+
   const formatter = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 
   const intervals: Array<[Intl.RelativeTimeFormatUnit, number]> = [

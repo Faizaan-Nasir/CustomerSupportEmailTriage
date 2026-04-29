@@ -197,6 +197,7 @@ The prototype already demonstrates several robust capabilities:
 - **Multilingual Support:** Handles English and Arabic natively with high contextual accuracy, avoiding the pitfalls of machine translation.
 - **Urgency-Driven Triage:** Effectively prioritizes high-stakes issues (like security threats or billing errors) for immediate human escalation.
 - **Cautious Interpretation:** A key design feature is that the LLM is instructed to side with a **lower confidence score** when it is unsure about a decision. This "cautious-by-default" approach is a significant advantage, as it prevents the system from taking incorrect automated actions on ambiguous tickets, instead opting to ask the customer for clarifying details.
+- **Invoice/Bill Suggestion:** To further reduce back-and-forth, if the system identifies three or more pieces of missing information, it intelligently suggests that the customer provide a copy of their bill or invoice. This is often the easiest way for customers to provide all necessary details at once.
 - **Subject-Line Awareness:** Intelligent extraction of entities from both the subject and body reduces redundant back-and-forth.
 
 ### Areas for Improvement

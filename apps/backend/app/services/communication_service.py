@@ -121,11 +121,18 @@ class CommunicationService:
             opening = "We understand this feels urgent. " + opening
 
         if ask_for_info and required_fields:
-            email_body = (
-                f"{opening}\n\n"
-                "To move this forward without unnecessary back-and-forth, please share:\n"
-                f"{_format_required_fields(required_fields)}"
-            )
+            if len(required_fields) >= 3:
+                missing_info_text = (
+                    "To move this forward quickly, please share a copy of your bill or invoice "
+                    "containing your order details, or provide the following information:\n"
+                    f"{_format_required_fields(required_fields)}"
+                )
+            else:
+                missing_info_text = (
+                    "To move this forward without unnecessary back-and-forth, please share:\n"
+                    f"{_format_required_fields(required_fields)}"
+                )
+            email_body = f"{opening}\n\n{missing_info_text}"
         else:
             email_body = opening
 
@@ -142,6 +149,7 @@ class CommunicationService:
 
         category = _normalize_label(str(payload.get("category") or ""))
         confidence = float(payload.get("confidence") or 0.0)
+        required_fields = payload.get('required_fields', [])
 
         prompt = f"""
 You are a helpful customer support agent. Generate a concise, context-aware response to the customer.
@@ -152,7 +160,7 @@ Current Situation:
 - Category: {payload.get('category')}
 - Sentiment: {payload.get('sentiment')}
 - Confidence: {payload.get('confidence')}
-- Missing Info: {', '.join(payload.get('required_fields', [])) if payload.get('ask_for_info') else 'None'}
+- Missing Info: {', '.join(required_fields) if payload.get('ask_for_info') else 'None'}
 
 Guidelines:
 - IMPORTANT: If the conversation history is primarily in Arabic or the customer just wrote in Arabic, you MUST respond in Arabic.
@@ -161,26 +169,27 @@ Guidelines:
 - Be empathetic if the sentiment is frustrated.
 - If 'Category' is 'unrelated', politely explain that this seems to be a mistake and suggest they check the email address.
 - If 'Missing Info' is not 'None' AND confidence is high, politely ask for the missing details.
+- SPECIAL RULE: If there are 3 or more items listed in 'Missing Info', suggest that providing a bill or invoice would be the easiest way to share all the required details.
 - Keep it under 3-4 sentences.
 - Do not use placeholders like [Name].
 - End with a professional closing.
 - Do not include the "AI generated" warning here; it will be added by the service.
 
-Example (English - Clear): 
+Example (English - Clear - Many missing fields): 
 \"\"\"
 Sample Input:
 Current Situation:
 - Intent: request_refund
 - Category: billing_issue
 - Sentiment: frustrated
-- Missing Info: Order ID, Payment method
+- Missing Info: Order ID, Invoice ID, Payment method
 
 Sample Output:
 Dear Customer,
-We're sorry to hear about the billing issue you're experiencing and we'd like to resolve it as quickly as possible. 
-While the issue has been forwarded to our customer support team, we request you to provide us additional information to help us expedite the process. 
-This includes your Order ID and Payment method.
-Thank you for your patience and cooperation.
+We're sorry to hear about the billing issue you're experiencing. 
+To help us resolve this quickly, please provide a copy of your invoice or bill containing your order details. 
+Alternatively, you can share your Order ID, Invoice ID, and Payment method used.
+Thank you for your cooperation.
 Sincerely,
 Customer Support Team
 \"\"\"
@@ -203,21 +212,6 @@ Sample Output:
 فريق دعم العملاء
 \"\"\"
 
-Example (English - Uncertain):
-\"\"\"
-Sample Input:
-Current Situation:
-- Category: uncertain
-- Confidence: 0.4
-
-Sample Output:
-Dear Customer,
-Thanks for reaching out. We've received your message and are currently looking into the details. 
-A member of our customer service team will review your request and get back to you with an update as soon as possible.
-Sincerely,
-Customer Support Team
-\"\"\"
-
 Response:
 """.strip()
 
@@ -225,7 +219,7 @@ Response:
         response = get_client().generate_text(prompt, temperature=0.7)
         email_body = response["text"].strip()
         email_body = f"{email_body}\n\n---\nThis response is AI generated"
-        
+
         return {"email_body": email_body}
 
 
@@ -243,3 +237,5 @@ def get_communication_service() -> CommunicationService:
 def generate_email(payload: CommunicationInput) -> CommunicationResult:
     """Compatibility helper matching the technical document wording."""
     return get_communication_service().generate_email(payload)
+
+

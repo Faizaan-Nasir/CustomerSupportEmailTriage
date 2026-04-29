@@ -1,0 +1,59 @@
+**RECEIPT**
+
+---
+
+**Store Name:** LittleNest Baby Essentials
+**Store Address:** 45 Green Avenue, Bengaluru, India
+**Email:** [support@littlenest.com](mailto:support@littlenest.com)
+**Phone:** +91-98765-43210
+
+---
+
+**Order ID:** LN-48273915
+**Receipt No.:** RCPT-993184
+**Order Date:** 12 April 2026
+**Payment Date:** 12 April 2026
+**Delivery Date:** 15 April 2026
+
+---
+
+**Customer Name:** Faizaan
+**Billing Address:** 22 Maple Residency, Bengaluru, India
+**Shipping Address:** Same as billing
+
+---
+
+**Product Details:**
+
+| Item          | Quantity | Unit Price (INR) | Total (INR) |
+| ------------- | -------- | ---------------- | ----------- |
+| Baby Stroller | 1        | 7,500            | 7,500       |
+
+---
+
+**Subtotal:** ₹7,500
+**Shipping Charges:** ₹250
+**Tax (GST 18%):** ₹1,350
+
+**Total Amount Paid:** ₹9,100
+
+---
+
+**Payment Method:** Credit Card (Visa **** 4821)
+**Transaction ID:** TXN784512993
+
+---
+
+**Order Status:** Delivered
+
+---
+
+**Return Policy:**
+Items can be returned within 7 days of delivery if unused and in original packaging.
+
+---
+
+**Notes:**
+Thank you for shopping with LittleNest Baby Essentials. For any issues, please contact our support team.
+
+---

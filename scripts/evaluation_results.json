@@ -3,9 +3,9 @@
     "id": "eval_new_01",
     "success": true,
     "output": {
-      "ticket_id": "3d168053-a64e-42fd-b484-1de2fe57f0b3",
+      "ticket_id": "95caaffd-3f69-48b2-8ca6-36230c44aa80",
       "status": "processed",
-      "email_body": "Dear Mark Thompson,\n\nWe are so sorry to hear about the missing hardware for your Scandinavian Modern Oak Dining Table (Order #FUR-4433) and understand your frustration, especially with guests arriving tomorrow. We will prioritize getting this resolved for you immediately – we’ll ship a replacement hardware kit overnight. If the hardware doesn’t arrive in time, please let us know and we will dispatch a technician to assemble the table for you.\n\nSincerely,\nCustomer Support Team\n\n---\nThis response is AI generated",
+      "email_body": "Dear Mark Thompson,\n\nI sincerely apologize for the missing hardware and the frustration this is causing, especially with your dinner party tomorrow. We will overnight a replacement hardware kit to you immediately, and you should receive it within 24 hours. If the kit doesn’t arrive in time, please let us know and we will dispatch a technician to assemble the table for you. \n\nSincerely,\nCustomer Support Team\n\n---\nThis response is AI generated",
       "escalated": true,
       "escalation_target": "product_support"
     },
@@ -20,9 +20,9 @@
     "id": "eval_new_02",
     "success": true,
     "output": {
-      "ticket_id": "4d53a469-43f1-4368-b5c0-f3a7f13a2306",
+      "ticket_id": "2f712d34-be52-4bcd-9e26-2b2e6be4691c",
       "status": "processed",
-      "email_body": "عزيزتي فاطمة حسن،\nنتفهم تماماً استياءك من خصم رسوم التجديد دون إشعار مسبق، ونعتذر عن ذلك. سنقوم فوراً بمعالجة طلب إلغاء اشتراكك في باقة 'المتسوق المميز' واسترداد مبلغ 199 ريالاً إلى بطاقتك الائتمانية. سيتم تحويل حسابك إلى حساب عادي خلال 24 ساعة، وسنرسل لك تأكيداً بذلك.\n\nمع خالص التحية،\nفريق دعم العملاء.\n\n---\nThis response is AI generated",
+      "email_body": "عزيزتي فاطمة حسن،\nنتفهم تماماً انزعاجكِ من خصم رسوم التجديد السنوي دون إشعار مسبق، ونعتذر عن ذلك. سنقوم فوراً بمعالجة طلب إلغاء اشتراكك في باقة 'المتسوق المميز' واسترداد مبلغ 199 ريال. سيتم إعادة حسابك إلى حساب عادي، وسنوافيكِ بتأكيد عملية الاسترداد في أقرب وقت ممكن.\n\nمع خالص التحية،\nفريق دعم العملاء.\n\n---\nThis response is AI generated",
       "escalated": true,
       "escalation_target": "finance"
     },
@@ -37,9 +37,9 @@
     "id": "eval_new_03",
     "success": true,
     "output": {
-      "ticket_id": "9cf1df33-f27e-4b22-862b-500ce7d40fc1",
+      "ticket_id": "283e1cb3-0036-4d53-9518-8db738b7212b",
       "status": "processed",
-      "email_body": "Dear James O'Connor,\n\nI sincerely apologize for the repeated errors with your order #RPT-0091 and the immense frustration this has caused. This is certainly not the level of service we aim to provide, and I understand your disappointment regarding the incorrect items and time spent on returns. I am immediately escalating this to our fulfillment team to investigate what happened with the barcode scanning process and will ensure the correct QC-35 headphones are shipped to you via expedited shipping at no additional cost – and a prepaid return label will be provided for the incorrect earbuds. \n\nSincerely,\nCustomer Support Team\n\n---\nThis response is AI generated",
+      "email_body": "Dear James O'Connor,\n\nI sincerely apologize for the repeated errors with your order #RPT-0091 and the immense frustration this has caused. This is certainly not the level of service we aim to provide, and I understand your disappointment with the lack of quality control. I will immediately escalate this to our fulfillment team to investigate what went wrong and ensure the correct QC-35 headphones are shipped to you via expedited shipping – with free return shipping for the incorrect items. \n\nSincerely,\nCustomer Support Team\n\n---\nThis response is AI generated",
       "escalated": true,
       "escalation_target": "product_support"
     },
@@ -54,9 +54,9 @@
     "id": "eval_new_04",
     "success": true,
     "output": {
-      "ticket_id": "6f18e1b2-4b18-4451-abc9-f3313f7d04e6",
+      "ticket_id": "2a8f44e0-0c7b-4b8d-96eb-de38f17ff0ab",
       "status": "processed",
-      "email_body": "عزيزي محمد خالد،\nنتفهم قلقك بشأن تأخر طلبك رقم 66554، خاصةً مع اقتراب عيد ميلاد ابنك. نعتذر عن هذا التأخير غير المعتاد ونؤكد لك أننا سنتواصل مع شركة الشحن للاستفسار عن سبب الانتظار في التخليص الجمركي وما إذا كان هناك أي إجراء يمكنك اتخاذه لتسريع العملية. سنوافيك بتحديث في أقرب وقت ممكن.\nمع خالص التحية،\nفريق دعم العملاء.\n\n---\nThis response is AI generated",
+      "email_body": "عزيزي محمد خالد،\n\nنتفهم قلقك بشأن تأخر طلبك رقم 66554، خاصةً مع اقتراب عيد ميلاد ابنك. نعتذر عن هذا التأخير غير المعتاد، وسنتواصل فوراً مع شركة الشحن للاستفسار عن سبب الانتظار في التخليص الجمركي وما إذا كان هناك أي إجراء يمكنك اتخاذه لتسريع العملية. سنوافيك بآخر المستجدات في أقرب وقت ممكن.\n\nمع خالص التحية،\nفريق دعم العملاء.\n\n---\nThis response is AI generated",
       "escalated": true,
       "escalation_target": "logistics"
     },
@@ -71,9 +71,9 @@
     "id": "eval_new_05",
     "success": true,
     "output": {
-      "ticket_id": "2a0b5b56-7fe9-4107-b618-288e246307ae",
+      "ticket_id": "8466295b-c030-4221-bd52-1f67a492618e",
       "status": "processed",
-      "email_body": "Dear Emily Watson,\n\nThank you for taking the time to share your feedback on the recent app update – we truly appreciate your loyalty as a long-time user. We understand your points about the Wishlist shortcut and product description font size, and will certainly pass them along to our product team for consideration in future patches. We're glad to hear you're enjoying the dark mode and faster checkout! \n\nSincerely,\nCustomer Support Team\n\n---\nThis response is AI generated",
+      "email_body": "Dear Emily Watson,\n\nThank you for taking the time to share your feedback on the recent 4.0 update – we appreciate your loyalty as a long-time user! We understand your concerns regarding the Wishlist shortcut and the product description font size, and will certainly pass this along to our product team for consideration in future patches. We’re glad to hear you’re enjoying the dark mode and improved checkout flow as well. \n\nSincerely,\nCustomer Support Team\n\n---\nThis response is AI generated",
       "escalated": false,
       "escalation_target": null
     },
@@ -88,9 +88,9 @@
     "id": "eval_new_06",
     "success": true,
     "output": {
-      "ticket_id": "3abbf325-62cf-4eea-8ea8-2bbd90bd2e25",
+      "ticket_id": "10204e29-3168-400d-ad1f-f95f6eeebd1e",
       "status": "processed",
-      "email_body": "عزيزتي مريم،\nوعليكم السلام، نشكرك جزيل الشكر على ملاحظتك القيمة واهتمامك بمتجرنا. نحن نقدر لكِ اقتراحك بتوفير خيار \"التغليف الصديق للبيئة\" وسنعمل بالتأكيد على دراسة إمكانية تطبيقه في أقرب وقت ممكن للمساهمة في الحفاظ على البيئة. نتطلع دائماً لآراء عملائنا الكرام لتحسين خدماتنا.\n\nمع خالص التحية،\nفريق دعم العملاء.\n\n---\nThis response is AI generated",
+      "email_body": "عزيزتي مريم،\n\nوعليكم السلام، نشكرك جزيل الشكر على ملاحظتك القيمة واهتمامك بمتجرنا. نحن نقدر لكِ اهتمامك بالبيئة واقتراحك بتوفير خيار \"التغليف الصديق للبيئة\"، وهو أمر ندرسه حالياً بكل جدية. نأمل أن نتمكن من تطبيق هذه المبادرة قريباً للمساهمة في تقليل النفايات البلاستيكية.\n\nمع خالص التحية،\nفريق دعم العملاء.\n\n---\nThis response is AI generated",
       "escalated": false,
       "escalation_target": null
     },
@@ -105,9 +105,9 @@
     "id": "eval_new_07",
     "success": true,
     "output": {
-      "ticket_id": "04653e7f-605f-42d4-b17d-13b406f3fb72",
+      "ticket_id": "a4350618-3b27-46f4-b450-70a702498167",
       "status": "processed",
-      "email_body": "Dear Robert Garcia,\n\nThank you for reaching out to us with your security concerns; we understand this is very worrying, especially with your store credit balance. We have received your request to check for unauthorized orders and temporarily freeze your account, and our team is actively investigating both matters. We will provide you with a status update as quickly as possible. \n\nSincerely,\nCustomer Support Team\n\n---\nThis response is AI generated",
+      "email_body": "Dear Robert Garcia,\n\nThank you for reaching out to us immediately regarding this security notice – we understand your concern, especially with your store credit balance. We have received your request to check for unauthorized orders and temporarily freeze your account, and our team is actively investigating both right now. We will provide you with a status update as quickly as possible. \n\nSincerely,\nCustomer Support Team\n\n---\nThis response is AI generated",
       "escalated": true,
       "escalation_target": "account_support"
     },
@@ -122,9 +122,9 @@
     "id": "eval_new_08",
     "success": true,
     "output": {
-      "ticket_id": "ac932c50-abff-4233-bf1c-0710f3498f43",
+      "ticket_id": "7c1595a5-38d5-4f68-858b-8bb559418e9f",
       "status": "processed",
-      "email_body": "عزيزي عمر،\nشكراً لتواصلك معنا ورغبتك في شراء جهاز لابتوب جديد من متجرنا. نعم، الضمان يشمل العيوب المصنعية، ولكن الأضرار العرضية مثل انسكاب السوائل قد لا تكون مشمولة، ويمكنك تمديد الضمان لسنة إضافية مقابل مبلغ مادي. لدينا مراكز صيانة معتمدة في مدينة الرياض، ويمكنك زيارتها بدلاً من إرسال الجهاز بالبريد.\n\nمع خالص التحية،\nفريق دعم العملاء.\n\n---\nThis response is AI generated",
+      "email_body": "عزيزي عمر،\n\nشكراً لتواصلك واهتمامك بشراء جهاز 'لابتوب' جديد من متجرنا. نودّ تزويدك بتفاصيل الضمان: يغطي الضمان العيوب المصنعية، ولكن الأضرار العرضية مثل انسكاب السوائل قد لا تكون مشمولة، ويمكنك تمديد الضمان لسنة إضافية مقابل رسوم إضافية. لدينا مراكز صيانة معتمدة في الرياض، ويمكنك زيارتها بدلاً من إرسال الجهاز بالبريد.\n\nمع خالص التحية،\nفريق دعم العملاء.\n\n---\nThis response is AI generated",
       "escalated": false,
       "escalation_target": null
     },
@@ -137,16 +137,28 @@
   },
   {
     "id": "eval_new_09",
-    "success": false,
-    "error": "Status code 500: {\"detail\":\"Gemini request failed after 3 attempts.\"}"
+    "success": true,
+    "output": {
+      "ticket_id": "2f4c0c90-c97a-47c1-a071-a21c051ee5ba",
+      "status": "processed",
+      "email_body": "Dear Jennifer Lee,\n\nThank you for reaching out and considering a partnership with us – we appreciate you thinking of our smart home products for your 'Summer Home Essentials' feature! We’ve received your email and media kit and will review them carefully to explore potential collaboration opportunities. We will be in touch shortly with next steps. \n\nSincerely,\nCustomer Support Team\n\n---\nThis response is AI generated",
+      "escalated": false,
+      "escalation_target": null
+    },
+    "expected": {
+      "intent": "unrelated",
+      "category": "unrelated",
+      "sentiment": "neutral",
+      "urgency": "low"
+    }
   },
   {
     "id": "eval_new_10",
     "success": true,
     "output": {
-      "ticket_id": "2f70065a-0224-4898-b047-4a860b539d8f",
+      "ticket_id": "ee2186eb-a77a-4431-a79d-c2b5986c6b1e",
       "status": "processed",
-      "email_body": "عزيزتي سارة،\nنتفهم إحباطكِ بسبب مشكلة كود الخصم 'WELCOME20' ورغبتكِ في إتمام طلبكِ بسرعة. نعتذر عن هذا العطل التقني، ونؤكد لكِ أننا سنبذل قصارى جهدنا لمساعدتكِ. يرجى تزويدنا برقم طلبكِ وطريقة الدفع التي تستخدمينها حتى نتمكن من التحقق من الأمر وتفعيل الخصم يدوياً أو تزويدكِ بكود بديل.\nمع خالص التحية،\nفريق دعم العملاء.\n\n---\nThis response is AI generated",
+      "email_body": "عزيزتي سارة،\n\nنتفهم إحباطكِ بسبب مشكلة كود الخصم، ونعتذر عن أي إزعاج قد سببه لكِ ذلك. يبدو أن هناك مشكلة فنية تمنع تفعيل الكود 'WELCOME20'. لتسريع عملية المساعدة، يرجى تزويدنا بمعلومات حول طريقة الدفع التي تستخدمينها.\n\nمع خالص التحية،\nفريق دعم العملاء.\n\n---\nThis response is AI generated",
       "escalated": false,
       "escalation_target": null
     },
