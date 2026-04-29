@@ -9,11 +9,19 @@ export function formatLabel(value: string | null | undefined): string {
     .join(" ");
 }
 
+function parseUtcTimestamp(value: string): Date {
+  const trimmed = value.trim();
+  const normalizedFractional = trimmed.replace(/(\.\d{3})\d+/, "$1");
+  const hasTimezone = /[zZ]$|[+-]\d{2}:?\d{2}$/.test(normalizedFractional);
+  const normalized = hasTimezone ? normalizedFractional : `${normalizedFractional}Z`;
+  return new Date(normalized);
+}
+
 export function formatRelativeTime(value: string): string {
-  const date = new Date(value);
+  const date = parseUtcTimestamp(value);
   let deltaMs = date.getTime() - Date.now();
-  
-  // If the time is in the future (due to clock skew between client/server), 
+
+  // If the time is in the future (due to clock skew between client/server),
   // or extremely recent (less than 10 seconds ago), return "just now".
   if (deltaMs > -10000) {
     return "just now";

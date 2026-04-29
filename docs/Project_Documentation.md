@@ -214,7 +214,7 @@ A major next step for this project would be the **fine-tuning of the underlying 
 
 ## Final Notes
 
-This markdown file was also generated with the help of ChatGPT, mainly to reduce time spent on formatting.
+This markdown file was also generated with the help of ChatGPT, mainly to reduce time spent on formatting. While the content was provided by me, the formatting and writing part wad done by ChatGPT.
 
 Overall, the project combines:
 - Independently developed ideas and design decisions
