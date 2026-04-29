@@ -51,6 +51,16 @@ CATEGORY_STEPS: dict[str, list[str]] = {
         "Check whether the issue can be resolved without escalation.",
         "Prepare the customer update with the safest next step.",
     ],
+    "unrelated": [
+        "Verify if the email was intended for another recipient or department.",
+        "Assess if the message is spam or off-topic chatter.",
+        "Close the ticket as 'unrelated' and avoid further automated follow-ups.",
+    ],
+    "uncertain": [
+        "Perform a deep manual review of the conversation history.",
+        "Identify the core customer issue and categorize it manually.",
+        "Engage with the customer with a personalized response to resolve the ambiguity.",
+    ],
 }
 
 

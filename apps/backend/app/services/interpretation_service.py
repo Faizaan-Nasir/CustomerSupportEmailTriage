@@ -76,6 +76,8 @@ CATEGORY_ALIASES: dict[str, str] = {
     "spam": "unrelated",
     "other": "unrelated",
     "personal": "unrelated",
+    "uncertain": "uncertain",
+    "unknown": "uncertain",
 }
 
 INTENT_ALIASES: dict[str, str] = {
@@ -88,6 +90,11 @@ INTENT_ALIASES: dict[str, str] = {
     "general_question": "general_inquiry",
     "general_inquiry": "general_inquiry",
     "inquiry": "general_inquiry",
+    "unrelated": "unrelated",
+    "spam": "unrelated",
+    "chat": "unrelated",
+    "uncertain": "uncertain",
+    "unknown": "uncertain",
 }
 
 SENTIMENT_ALIASES: dict[str, str] = {
@@ -98,6 +105,8 @@ SENTIMENT_ALIASES: dict[str, str] = {
     "angry": "frustrated",
     "urgent": "urgent",
     "anxious": "urgent",
+    "uncertain": "uncertain",
+    "unknown": "uncertain",
 }
 
 
@@ -146,8 +155,13 @@ class InterpretationService:
 Assume the role of a customer support analyst interpreting the customer's current message in the context of the entire email thread.
 
 Your output becomes the single source of truth for downstream actions, so it must
-be consistent, cautious, and grounded in the entire interaction history.
-If the email is ambiguous, it's better to be uncertain than to guess. Always follow the guidelines and never return labels outside of the specified sets.
+be consistent, cautious, and grounded strictly in the provided text.
+
+CRITICAL GUARDRAILS:
+- DO NOT use assumed data. Do not invent facts, product names, or issue details not explicitly stated.
+- If the provided data is insufficient to take a clear call, set the relevant label(s) to "uncertain" and significantly drop the confidence score (below 0.5).
+- If the email is ambiguous or lacks enough detail to identify a specific issue, it is better to be "uncertain" than to guess.
+- If the email is totally unrelated to our products or services, categorize it as "unrelated".
 
 {context_str}Current message from customer:
 \"\"\"
@@ -165,59 +179,44 @@ Interpret the interaction across the following dimensions:
 Guidelines:
 - Prefer normalized snake_case labels for intent, category, and sentiment.
 - Use only one of these category labels:
-    billing_issue, shipping_issue, product_issue, account_issue, complaint, general_inquiry, unrelated
-- When the message is about refunds, double charges, invoices, payments, or transaction problems,
-    use category billing_issue instead of alternate names like billing or billing_and_payments.
-- If the email is totally unrelated to the product, shopping, or legitimate support needs (e.g. general chatter, spam, or random prompts), categorize it as "unrelated" and provide a low confidence score.
+    billing_issue, shipping_issue, product_issue, account_issue, complaint, general_inquiry, unrelated, uncertain
 - Use only one of these intent labels when applicable:
-    request_refund, complaint, clarification_request, general_inquiry
+    request_refund, complaint, clarification_request, general_inquiry, unrelated, uncertain
 - Use only one of these sentiment labels when applicable:
-    neutral, frustrated, urgent
-- Do not invent facts not supported by the email or context.
-- If the email is ambiguous, lower confidence rather than overcommitting.
-- Urgency must be evaluated for the entire context of the thread. A second or third response
-    about a critical issue might increase urgency if it is still unresolved.
+    neutral, frustrated, urgent, uncertain
+- Urgency must be evaluated for the entire context of the thread.
 - Return JSON only.
 
 A sample email and ideal interpretation:
-Email 1:
+Email 1 (Clear):
 \"\"\"
-Respected sir,
-The baby milk I had bought from your online store happened to be expired. I only identified
-this issue when my 2-month-old baby drank the milk, got sick and was hospitalized. This coming from
-a reputed store that claims to provide best quality products is really disappointing.
-I request you to process a refund and also urge you to look into your inventory to ensure such things don't repeat.
+The baby milk I had bought from your online store happened to be expired. I request a refund.
 \"\"\"
-
 Ideal interpretation:
 {{
     "intent": "request_refund",
     "category": "product_issue",
     "sentiment": "frustrated",
-    "urgency": 0.9,
+    "urgency": 0.8,
     "confidence": 0.95,
-    "reasoning": "The customer is requesting a refund due to a defective product that caused harm to their baby, which is a highly urgent and frustrating situation."
+    "reasoning": "Clear request for a refund due to an expired food product."
 }}
 
-Email 2: 
+Email 2 (Uncertain/Insufficient Data):
 \"\"\"
-Respected sir, 
-I recently ordered a stroller from your online store, however I have received the order 5 days
-after it was supposed to be delivered. This was only after a lot of back and forth with the delivery company.
-I would request you to formally look into this matter and ensure that such delays don't happen in the future.
+I have a problem with my order. Please help.
 \"\"\"
-
 Ideal interpretation:
 {{
-    "intent": "complaint",
-    "category": "shipping_issue",
-    "sentiment": "frustrated",
-    "urgency": 0.5,
-    "confidence": 0.9,
-    "reasoning": "The customer is expressing frustration about a delayed delivery and is requesting the company to address the issue to prevent future occurrences."
+    "intent": "uncertain",
+    "category": "uncertain",
+    "sentiment": "neutral",
+    "urgency": 0.3,
+    "confidence": 0.4,
+    "reasoning": "The customer mentions a problem but does not provide enough detail to categorize the issue or intent."
 }}
-Note that not every email will be urgent, and not every email will be low urgency. So make sure that you're weighing in everything before taking a call.
-You may get information in Arabic as well, you should still respond in English and use the same normalized labels. Always follow the guidelines and never return labels outside of the specified sets.
+
+You may get information in Arabic as well, you should still respond in English and use the same normalized labels. Always follow the guidelines.
 """.strip()
 
     def interpret_email(self, payload: InterpretationInput) -> InterpretationResult:

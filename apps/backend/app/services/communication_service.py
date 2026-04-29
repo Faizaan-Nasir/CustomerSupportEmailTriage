@@ -34,6 +34,8 @@ LABEL_TEXT: dict[str, str] = {
     "neutral": "neutral",
     "frustrated": "frustrating",
     "urgent": "urgent",
+    "unrelated": "unrelated matter",
+    "uncertain": "review",
 }
 
 FIELD_TEXT: dict[str, str] = {
@@ -84,6 +86,24 @@ class CommunicationService:
             # Use LLM for context-aware response when history exists
             return self._generate_context_aware_email(payload)
 
+        # Handle Uncertainty or Low Confidence
+        if category == "uncertain" or confidence < 0.5:
+            opening = (
+                "Thanks for reaching out. We've received your message and our customer service team "
+                "will review your request and get back to you with a personalized response shortly."
+            )
+            email_body = f"{opening}\n\n---\nThis response is AI generated"
+            return {"email_body": email_body}
+
+        if category == "unrelated":
+            opening = (
+                "Thanks for reaching out. It appears this message may have been sent to us by mistake, "
+                "as it is unrelated to our support services. Please check the email address carefully "
+                "before sending your mail again."
+            )
+            email_body = f"{opening}\n\n---\nThis response is AI generated"
+            return {"email_body": email_body}
+
         if confidence >= 0.75:
             opening = (
                 f"It looks like you're facing {_label_text(category)}. "
@@ -120,6 +140,9 @@ class CommunicationService:
         for msg in context:
             context_str += f"- {msg.get('sender', 'unknown')}: {msg.get('content', '')}\n"
 
+        category = _normalize_label(str(payload.get("category") or ""))
+        confidence = float(payload.get("confidence") or 0.0)
+
         prompt = f"""
 You are a helpful customer support agent. Generate a concise, context-aware response to the customer.
 
@@ -128,19 +151,22 @@ Current Situation:
 - Intent: {payload.get('intent')}
 - Category: {payload.get('category')}
 - Sentiment: {payload.get('sentiment')}
+- Confidence: {payload.get('confidence')}
 - Missing Info: {', '.join(payload.get('required_fields', [])) if payload.get('ask_for_info') else 'None'}
 
 Guidelines:
 - IMPORTANT: If the conversation history is primarily in Arabic or the customer just wrote in Arabic, you MUST respond in Arabic.
+- If the 'Category' is 'uncertain' or 'Confidence' is low (below 0.5), politely explain that a customer service representative will review their specific case and respond soon.
 - Acknowledge previous points if the customer just provided them.
 - Be empathetic if the sentiment is frustrated.
-- If 'Missing Info' is not 'None', politely ask for the missing details.
+- If 'Category' is 'unrelated', politely explain that this seems to be a mistake and suggest they check the email address.
+- If 'Missing Info' is not 'None' AND confidence is high, politely ask for the missing details.
 - Keep it under 3-4 sentences.
 - Do not use placeholders like [Name].
 - End with a professional closing.
 - Do not include the "AI generated" warning here; it will be added by the service.
 
-Example (English): 
+Example (English - Clear): 
 \"\"\"
 Sample Input:
 Current Situation:
@@ -159,7 +185,7 @@ Sincerely,
 Customer Support Team
 \"\"\"
 
-Example (Arabic):
+Example (Arabic - Clear):
 \"\"\"
 Sample Input:
 Current Situation:
@@ -175,6 +201,21 @@ Sample Output:
 شكراً لصبرك وتعاونك معنا.
 مع خالص التحية،
 فريق دعم العملاء
+\"\"\"
+
+Example (English - Uncertain):
+\"\"\"
+Sample Input:
+Current Situation:
+- Category: uncertain
+- Confidence: 0.4
+
+Sample Output:
+Dear Customer,
+Thanks for reaching out. We've received your message and are currently looking into the details. 
+A member of our customer service team will review your request and get back to you with an update as soon as possible.
+Sincerely,
+Customer Support Team
 \"\"\"
 
 Response:
