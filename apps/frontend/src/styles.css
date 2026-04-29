@@ -285,12 +285,19 @@ textarea {
 .ticket-card h3 {
   font-size: 1rem;
   margin: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .ticket-card p,
 .ticket-card__time {
   color: rgba(248, 241, 229, 0.72);
   margin: 0;
+}
+
+.ticket-card p {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .ticket-card .urgency-pill,
@@ -678,7 +685,7 @@ textarea {
 
 .modal-card {
   max-height: min(90vh, 920px);
-  max-width: 760px;
+  max-width: 640px;
   width: 100%;
   padding: 16px 0;
   overflow: hidden;
