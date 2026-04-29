@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 
 import TicketList from "../components/TicketList";
@@ -20,6 +20,19 @@ export default function Dashboard() {
   const [lastTicketId, setLastTicketId] = useState<string | null>(null);
   const [lastThreadId, setLastThreadId] = useState<string | null>(null);
   const [escalationInfo, setEscalationInfo] = useState<{ escalated: boolean; target?: string } | null>(null);
+  
+  // States for RTL control
+  const [inputIsArabic, setInputIsArabic] = useState(false);
+  const [responseIsArabic, setResponseIsArabic] = useState(false);
+
+  // Auto-detect Arabic on incoming AI response if it contains Arabic characters
+  const detectedResponseArabic = useMemo(() => {
+    if (!aiResponse) return false;
+    const arabicPattern = /[\u0600-\u06FF]/;
+    return arabicPattern.test(aiResponse);
+  }, [aiResponse]);
+
+  const useResponseRtl = responseIsArabic || detectedResponseArabic;
 
   function resetSimulationForm() {
     setCustomerEmail("");
@@ -32,6 +45,8 @@ export default function Dashboard() {
     setLastTicketId(null);
     setLastThreadId(null);
     setEscalationInfo(null);
+    setInputIsArabic(false);
+    setResponseIsArabic(false);
   }
 
   function closeSimulation() {
@@ -62,7 +77,6 @@ export default function Dashboard() {
       setLastThreadId(currentThreadId);
       setEscalationInfo({ escalated: !!response.escalated, target: response.escalation_target });
       
-      // Clear body/attachments but keep thread/email for continuation
       setBody("");
       setAttachments([]);
     } catch (simulationError) {
@@ -84,7 +98,12 @@ export default function Dashboard() {
 
       <main className="app-shell__content">
         <section className="hero-panel">
-          <p className="eyebrow">Agent dashboard</p>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <p className="eyebrow">Agent dashboard</p>
+            <span className="status-badge status-badge--resolved" style={{ fontSize: "0.7rem", padding: "4px 10px" }}>
+              Native Multilingual AI Active
+            </span>
+          </div>
           <h1>Decision mode for support operations.</h1>
           <p>
             Review the prioritized queue, open a ticket, inspect the system
@@ -129,10 +148,10 @@ export default function Dashboard() {
               </p>
             </article>
             <article>
-              <strong>Surface gaps clearly</strong>
+              <strong>Native Arabic Support</strong>
               <p>
-                Missing information is separated from extracted data so agents can
-                tell what is known versus what still blocks action.
+                While the dashboard interface is in English for agents, the AI natively
+                interprets and responds to Arabic customer emails without translation.
               </p>
             </article>
             <article>
@@ -157,7 +176,7 @@ export default function Dashboard() {
             <div className="modal-card__scroll-area">
               <div className="panel__header panel__header--spread">
                 <div>
-                  <p className="eyebrow">Simulation</p>
+                  <p className="eyebrow">Simulation • Arabic Supported</p>
                   <h2>Send a customer email</h2>
                 </div>
                 <button className="icon-button" onClick={closeSimulation} type="button">
@@ -166,6 +185,10 @@ export default function Dashboard() {
               </div>
 
               <div className="simulation-form">
+                <p className="panel__message" style={{ fontSize: "0.85rem", opacity: 0.8 }}>
+                  The AI natively processes both English and Arabic. Use the RTL toggle below if you wish to type your simulation in Arabic.
+                </p>
+
                 <label className="simulation-field">
                   <span>Customer email</span>
                   <input
@@ -181,7 +204,11 @@ export default function Dashboard() {
                     <span>Title</span>
                     <input
                       onChange={(event) => setSubject(event.target.value)}
-                      placeholder="Order refund request"
+                      placeholder={inputIsArabic ? "طلب استرداد مبلغ" : "Order refund request"}
+                      style={{ 
+                        direction: inputIsArabic ? "rtl" : "ltr",
+                        textAlign: inputIsArabic ? "right" : "left"
+                      }}
                       type="text"
                       value={subject}
                     />
@@ -198,15 +225,30 @@ export default function Dashboard() {
                   </label>
                 </div>
 
-                <label className="simulation-field simulation-field--body">
-                  <span>Body</span>
+                <div className="simulation-field">
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span>Body</span>
+                    <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.75rem", cursor: "pointer", color: "var(--text-muted)" }}>
+                      <input 
+                        type="checkbox" 
+                        checked={inputIsArabic} 
+                        onChange={(e) => setInputIsArabic(e.target.checked)} 
+                      />
+                      Type in Arabic (RTL)
+                    </label>
+                  </div>
                   <textarea
                     onChange={(event) => setBody(event.target.value)}
-                    placeholder="Write the customer's message here..."
+                    placeholder={inputIsArabic ? "اكتب رسالة العميل هنا..." : "Write the customer's message here..."}
                     rows={8}
+                    style={{ 
+                      direction: inputIsArabic ? "rtl" : "ltr",
+                      textAlign: inputIsArabic ? "right" : "left",
+                      fontFamily: inputIsArabic ? "Source Sans Pro, Arial, sans-serif" : "inherit"
+                    }}
                     value={body}
                   />
-                </label>
+                </div>
 
                 <label className="simulation-field">
                   <span>Attachments</span>
@@ -231,8 +273,27 @@ export default function Dashboard() {
 
                 {aiResponse ? (
                   <div className="simulation-response">
-                    <p className="eyebrow">System Response</p>
-                    <div className="email-body" style={{ marginTop: "8px", fontSize: "0.9rem" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <p className="eyebrow">System Response</p>
+                      <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.8rem", cursor: "pointer" }}>
+                        <input 
+                          type="checkbox" 
+                          checked={useResponseRtl} 
+                          onChange={(e) => setResponseIsArabic(e.target.checked)} 
+                        />
+                        RTL Mode (Arabic)
+                      </label>
+                    </div>
+                    <div 
+                      className="email-body" 
+                      style={{ 
+                        marginTop: "8px", 
+                        fontSize: "0.9rem",
+                        direction: useResponseRtl ? "rtl" : "ltr",
+                        textAlign: useResponseRtl ? "right" : "left",
+                        fontFamily: useResponseRtl ? "Source Sans Pro, Arial, sans-serif" : "inherit"
+                      }}
+                    >
                       {aiResponse}
                     </div>
 

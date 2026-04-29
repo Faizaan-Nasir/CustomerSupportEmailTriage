@@ -13,6 +13,7 @@ import {
   formatPercent,
   formatTimestamp,
   getUrgencyMeta,
+  getRtlStyle,
 } from "../utils/format";
 
 export default function TicketDetail() {
@@ -83,7 +84,7 @@ export default function TicketDetail() {
                 </span>
               </div>
 
-              <article className="email-body">
+              <article className="email-body" style={getRtlStyle(detail.body)}>
                 <p>{detail.body || "No original body available."}</p>
               </article>
 
@@ -98,7 +99,7 @@ export default function TicketDetail() {
                         <strong>{formatLabel(message.sender)}</strong>
                         <span>{formatTimestamp(message.timestamp)}</span>
                       </div>
-                      <p>{message.content}</p>
+                      <p style={getRtlStyle(message.content)}>{message.content}</p>
                     </div>
                   ))
                 )}
@@ -108,11 +109,14 @@ export default function TicketDetail() {
             <section
               className={`panel ${interpretationWarning ? "panel--warning" : ""}`}
             >
-              <div className="panel__header">
+              <div className="panel__header panel__header--spread">
                 <div>
                   <p className="eyebrow">System interpretation</p>
                   <h2>Current understanding</h2>
                 </div>
+                <span className="status-badge" style={{ fontSize: "0.7rem", opacity: 0.8 }}>
+                  Arabic Native
+                </span>
               </div>
 
               <div className="interpretation-grid">

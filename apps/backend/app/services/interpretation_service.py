@@ -184,14 +184,14 @@ I request you to process a refund and also urge you to look into your inventory 
 \"\"\"
 
 Ideal interpretation:
-{
+{{
     "intent": "request_refund",
     "category": "product_issue",
     "sentiment": "frustrated",
     "urgency": 0.9,
     "confidence": 0.95,
     "reasoning": "The customer is requesting a refund due to a defective product that caused harm to their baby, which is a highly urgent and frustrating situation."
-}
+}}
 
 Email 2: 
 \"\"\"
@@ -202,14 +202,16 @@ I would request you to formally look into this matter and ensure that such delay
 \"\"\"
 
 Ideal interpretation:
-{
+{{
     "intent": "complaint",
     "category": "shipping_issue",
     "sentiment": "frustrated",
     "urgency": 0.5,
     "confidence": 0.9,
     "reasoning": "The customer is expressing frustration about a delayed delivery and is requesting the company to address the issue to prevent future occurrences."
-}
+}}
+Note that not every email will be urgent, and not every email will be low urgency. So make sure that you're weighing in everything before taking a call.
+You may get information in Arabic as well, you should still respond in English and use the same normalized labels. Always follow the guidelines and never return labels outside of the specified sets.
 """.strip()
 
     def interpret_email(self, payload: InterpretationInput) -> InterpretationResult:

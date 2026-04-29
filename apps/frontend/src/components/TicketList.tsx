@@ -56,7 +56,7 @@ export default function TicketList({
       <div className="panel__header panel__header--stacked">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
           <div>
-            <p className="eyebrow">Queue</p>
+            <p className="eyebrow">Queue • En/Ar Support</p>
             <h2>Ticket list</h2>
           </div>
           <button

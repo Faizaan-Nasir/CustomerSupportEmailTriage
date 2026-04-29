@@ -66,3 +66,26 @@ export function formatTimestamp(value: string): string {
     timeStyle: "short",
   }).format(new Date(value));
 }
+
+/**
+ * Returns true if the text contains Arabic characters.
+ */
+export function isArabic(text: string | null | undefined): boolean {
+  if (!text) return false;
+  const arabicPattern = /[\u0600-\u06FF]/;
+  return arabicPattern.test(text);
+}
+
+/**
+ * Returns a style object with RTL direction and right alignment if Arabic is detected.
+ */
+export function getRtlStyle(text: string | null | undefined): React.CSSProperties {
+  if (isArabic(text)) {
+    return {
+      direction: "rtl",
+      textAlign: "right",
+      fontFamily: "Source Sans Pro, Arial, sans-serif",
+    };
+  }
+  return {};
+}

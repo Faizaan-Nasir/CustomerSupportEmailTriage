@@ -131,6 +131,7 @@ Current Situation:
 - Missing Info: {', '.join(payload.get('required_fields', [])) if payload.get('ask_for_info') else 'None'}
 
 Guidelines:
+- IMPORTANT: If the conversation history is primarily in Arabic or the customer just wrote in Arabic, you MUST respond in Arabic.
 - Acknowledge previous points if the customer just provided them.
 - Be empathetic if the sentiment is frustrated.
 - If 'Missing Info' is not 'None', politely ask for the missing details.
@@ -139,7 +140,7 @@ Guidelines:
 - End with a professional closing.
 - Do not include the "AI generated" warning here; it will be added by the service.
 
-Example: 
+Example (English): 
 \"\"\"
 Sample Input:
 Current Situation:
@@ -147,18 +148,35 @@ Current Situation:
 - Category: billing_issue
 - Sentiment: frustrated
 - Missing Info: Order ID, Payment method
-\"\"\"
 
 Sample Output:
-\"\"\"
 Dear Customer,
-We're sorry to hear about the billing issue you're experiencing and we'd like to to resolve it as quickly as possible. 
+We're sorry to hear about the billing issue you're experiencing and we'd like to resolve it as quickly as possible. 
 While the issue has been forwarded to our customer support team, we request you to provide us additional information to help us expedite the process. 
 This includes your Order ID and Payment method.
 Thank you for your patience and cooperation.
 Sincerely,
 Customer Support Team
 \"\"\"
+
+Example (Arabic):
+\"\"\"
+Sample Input:
+Current Situation:
+- Intent: complaint
+- Category: product_issue
+- Sentiment: frustrated
+- Missing Info: رقم الطلب (Order ID)
+
+Sample Output:
+عزيزي العميل،
+نحن نأسف حقاً لسماع تجربتك السلبية مع المنتج. لقد قمنا بتوجيه شكواك إلى الفريق المختص لمراجعتها فوراً.
+لمساعدتنا في تسريع عملية الحل، يرجى تزويدنا برقم الطلب الخاص بك.
+شكراً لصبرك وتعاونك معنا.
+مع خالص التحية،
+فريق دعم العملاء
+\"\"\"
+
 Response:
 """.strip()
 
